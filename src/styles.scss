@@ -1,1 +1,16 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+@import './styles/tokens';
+@import './styles/reset';
+@import './styles/typography';
+
+@include mat.core();
+
+$signal-palette: mat.define-palette(mat.$blue-palette, 600);
+$signal-theme: mat.define-dark-theme((
+  color: (primary: $signal-palette, accent: $signal-palette),
+  typography: mat.define-typography-config(),
+  density: 0
+));
+
+@include mat.all-component-themes($signal-theme);

@@ -3,7 +3,7 @@
   "version": 1,
   "cli": {
     "packageManager": "npm",
-    "analytics": "b9b44d96-54b1-482d-a525-3395457539a4"
+    "analytics": false
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -51,6 +51,11 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src"
+              ]
+            },
             "assets": [
               "src/favicon.ico",
               "src/assets"
