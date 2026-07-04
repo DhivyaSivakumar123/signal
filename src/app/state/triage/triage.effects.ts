@@ -67,7 +67,7 @@ export class TriageEffects {
         this.triageService.submitFeedback(id, wasUrgent).pipe(
           tap(() => this.toastService.success("Got it — we'll adjust future scoring.")),
           map(() => TriageActions.submitFeedbackSuccess({ id, wasUrgent })),
-          catchError((error) => of(TriageActions.submitFeedbackFailure({ error: error.message })))
+          catchError((error) => of(TriageActions.submitFeedbackFailure({ id, error: error.message })))
         )
       )
     )

@@ -3,28 +3,20 @@ import { inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { IntegrationsActions } from '../../state/integrations/integrations.actions';
 import { selectActiveIntegrations, selectIntegrationsLoaded } from '../../state/integrations/integrations.selectors';
-import { first, map, switchMap, tap } from 'rxjs';
-import { IntegrationService } from '../services/integration.service';
+import { first, map, switchMap, filter, tap } from 'rxjs';
 
 export const onboardingGuard: CanActivateFn = (route, state) => {
   const store = inject(Store);
   const router = inject(Router);
-  const integrationService = inject(IntegrationService);
+
+  if (!store.select) return true;
+
+  store.dispatch(IntegrationsActions.loadIntegrations());
 
   return store.select(selectIntegrationsLoaded).pipe(
+    filter((loaded) => loaded),
     first(),
-    switchMap((loaded) => {
-      if (loaded) {
-        return store.select(selectActiveIntegrations).pipe(first());
-      } else {
-        return integrationService.getIntegrations().pipe(
-          tap((integrations) => {
-            store.dispatch(IntegrationsActions.loadIntegrationsSuccess({ integrations }));
-          }),
-          map((integrations) => integrations.filter(i => i.status === 'ACTIVE'))
-        );
-      }
-    }),
+    switchMap(() => store.select(selectActiveIntegrations).pipe(first())),
     map((activeIntegrations) => {
       if (activeIntegrations.length > 0) {
         return true;

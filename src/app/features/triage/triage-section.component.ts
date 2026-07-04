@@ -15,6 +15,7 @@ import { TriageCardComponent } from '../../shared/components/triage-card/triage-
           *ngFor="let item of items" 
           [item]="item" 
           [highlighted]="isHighlighted(item)" 
+          [submitting]="submittingItemIds.includes(item.id)"
           [class.dim-by-slot]="shouldDim(item)"
           (feedbackSubmitted)="feedback.emit($event)">
         </app-triage-card>
@@ -55,6 +56,7 @@ export class TriageSectionComponent {
   @Input() items: TriageItem[] = [];
   @Input() selectedSlot: FocusSlot | null = null;
   @Input() hasHighlightsInFeed = false;
+  @Input() submittingItemIds: string[] = [];
 
   @Output() feedback = new EventEmitter<{ id: string; wasUrgent: boolean }>();
 

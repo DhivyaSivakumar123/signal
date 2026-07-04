@@ -43,7 +43,7 @@ import { TriageActions } from '../../../state/triage/triage.actions';
         </div>
       </div>
 
-      <button class="save-btn" (click)="save()">Save Changes</button>
+      <button class="save-btn" [disabled]="saving" (click)="save()">{{ saving ? 'Saving...' : 'Save Changes' }}</button>
     </div>
   `,
   styles: [`
@@ -147,6 +147,7 @@ import { TriageActions } from '../../../state/triage/triage.actions';
 })
 export class FocusPreferencesComponent implements OnChanges {
   @Input() preferences: UserPreference | null = null;
+  @Input() saving = false;
 
   private store = inject(Store);
 

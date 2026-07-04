@@ -205,8 +205,7 @@ export class TeamAnalyticsComponent implements OnInit, OnDestroy {
     this.sub.add(
       combineLatest([this.user$, this.daysFilter$]).subscribe(([user, days]) => {
         if (user && user.role === 'MANAGER') {
-          this.store.dispatch(AnalyticsActions.loadTeamLoad({ managerId: user.id, days }));
-          this.store.dispatch(AnalyticsActions.loadRecommendations({ managerId: user.id }));
+          this.store.dispatch(AnalyticsActions.loadAnalyticsDashboard({ managerId: user.id, days }));
         }
       })
     );
@@ -220,5 +219,6 @@ export class TeamAnalyticsComponent implements OnInit, OnDestroy {
     const value = (event.target as HTMLSelectElement).value;
     const days = parseInt(value, 10);
     this.store.dispatch(AnalyticsActions.setDaysFilter({ days }));
+    this.store.dispatch(AnalyticsActions.loadAnalyticsDashboard({ managerId, days }));
   }
 }

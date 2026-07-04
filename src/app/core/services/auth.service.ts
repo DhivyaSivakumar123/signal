@@ -37,7 +37,8 @@ export class AuthService {
   }
 
   logout(): Observable<void> {
-    return this.http.post<void>(`${environment.apiUrl}/api/auth/logout`, {});
+    const refreshToken = this.getRefreshToken();
+    return this.http.post<void>(`${environment.apiUrl}/api/auth/logout`, { refreshToken });
   }
 
   // Token helpers — store access token in localStorage

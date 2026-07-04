@@ -4,8 +4,11 @@ import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AuthActions } from '../../state/auth/auth.actions';
-import { catchError, switchMap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, filter, switchMap, take, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
+
+let isRefreshing = false;
+const refreshSubject = new BehaviorSubject<string | null>(null);
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
@@ -34,16 +37,30 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         }
 
         const refreshToken = authService.getRefreshToken();
-        if (refreshToken) {
+        if (!refreshToken) {
+          authService.clearTokens();
+          store.dispatch(AuthActions.logoutSuccess());
+          router.navigate(['/login']);
+          return throwError(() => error);
+        }
+
+        if (!isRefreshing) {
+          isRefreshing = true;
+          refreshSubject.next(null);
+
           return authService.refreshToken(refreshToken).pipe(
             switchMap((tokens) => {
+              isRefreshing = false;
               authService.storeTokens(tokens);
+              refreshSubject.next(tokens.accessToken);
               const retryReq = req.clone({
                 setHeaders: { Authorization: `Bearer ${tokens.accessToken}` }
               });
               return next(retryReq);
             }),
             catchError((refreshErr) => {
+              isRefreshing = false;
+              refreshSubject.next(null);
               authService.clearTokens();
               store.dispatch(AuthActions.logoutSuccess());
               router.navigate(['/login']);
@@ -51,9 +68,16 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             })
           );
         } else {
-          authService.clearTokens();
-          store.dispatch(AuthActions.logoutSuccess());
-          router.navigate(['/login']);
+          return refreshSubject.pipe(
+            filter((token) => token !== null),
+            take(1),
+            switchMap((newToken) => {
+              const retryReq = req.clone({
+                setHeaders: { Authorization: `Bearer ${newToken}` }
+              });
+              return next(retryReq);
+            })
+          );
         }
       }
       return throwError(() => error);

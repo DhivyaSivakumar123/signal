@@ -2,12 +2,29 @@ import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { AnalyticsService } from '../../core/services/analytics.service';
 import { AnalyticsActions } from './analytics.actions';
-import { catchError, map, of, switchMap } from 'rxjs';
+import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
 
 @Injectable()
 export class AnalyticsEffects {
   private actions$ = inject(Actions);
   private analyticsService = inject(AnalyticsService);
+
+  loadDashboard$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnalyticsActions.loadAnalyticsDashboard),
+      switchMap(({ managerId, days }) =>
+        forkJoin({
+          teamLoad: this.analyticsService.getTeamLoad(managerId, days),
+          recommendations: this.analyticsService.getRecommendations(managerId)
+        }).pipe(
+          map(({ teamLoad, recommendations }) =>
+            AnalyticsActions.loadAnalyticsDashboardComplete({ teamLoad, recommendations })
+          ),
+          catchError((error) => of(AnalyticsActions.loadAnalyticsDashboardFailure({ error: error.message })))
+        )
+      )
+    )
+  );
 
   loadTeamLoad$ = createEffect(() =>
     this.actions$.pipe(

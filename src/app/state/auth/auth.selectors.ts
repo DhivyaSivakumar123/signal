@@ -10,7 +10,7 @@ export const selectUser = createSelector(
 
 export const selectIsAuthenticated = createSelector(
   selectAuthState,
-  (state: AuthState) => !!state.tokens?.accessToken || !!localStorage.getItem('signal_access_token')
+  (state: AuthState) => !!state.tokens?.accessToken
 );
 
 export const selectAuthLoading = createSelector(

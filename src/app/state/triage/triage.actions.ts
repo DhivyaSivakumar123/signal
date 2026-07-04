@@ -14,7 +14,7 @@ export const TriageActions = createActionGroup({
     
     'Submit Feedback': props<{ id: string; wasUrgent: boolean }>(),
     'Submit Feedback Success': props<{ id: string; wasUrgent: boolean }>(),
-    'Submit Feedback Failure': props<{ error: string }>(),
+    'Submit Feedback Failure': props<{ id: string; error: string }>(),
     
     'Load Preferences': emptyProps(),
     'Load Preferences Success': props<{ prefs: UserPreference }>(),

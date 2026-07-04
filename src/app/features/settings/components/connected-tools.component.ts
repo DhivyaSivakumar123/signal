@@ -32,8 +32,9 @@ import { SourceIconComponent } from '../../../shared/components/source-icon/sour
             </button>
             <button *ngIf="getActiveStatus(t.provider) !== 'Disconnected'" 
                     class="btn btn--disconnect" 
+                    [disabled]="loading"
                     (click)="disconnect(t.provider)">
-              Disconnect
+              {{ loading ? 'Disconnecting...' : 'Disconnect' }}
             </button>
           </div>
         </div>
@@ -154,6 +155,7 @@ import { SourceIconComponent } from '../../../shared/components/source-icon/sour
 })
 export class ConnectedToolsComponent {
   @Input() integrations: Integration[] = [];
+  @Input() loading = false;
 
   private store = inject(Store);
   private integrationService = inject(IntegrationService);

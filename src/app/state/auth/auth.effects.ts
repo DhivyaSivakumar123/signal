@@ -56,6 +56,21 @@ export class AuthEffects {
     { dispatch: false }
   );
 
+  loadCurrentUser$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.loadCurrentUser),
+      switchMap(() =>
+        this.authService.getCurrentUser().pipe(
+          map((user) => AuthActions.loadCurrentUserSuccess({ user })),
+          catchError((error) => {
+            this.authService.clearTokens();
+            return of(AuthActions.loadCurrentUserFailure({ error: error.message }));
+          })
+        )
+      )
+    )
+  );
+
   logout$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.logout),

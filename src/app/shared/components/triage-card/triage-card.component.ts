@@ -38,8 +38,13 @@ import { TruncatePipe } from '../../pipes/truncate.pipe';
         </div>
       </div>
       <div class="card__actions">
-        <button mat-icon-button (click)="onFeedback(true)" title="This was urgent" class="action-btn">👍</button>
-        <button mat-icon-button (click)="onFeedback(false)" title="Not urgent" class="action-btn">👎</button>
+        <ng-container *ngIf="submitting; else feedbackButtons">
+          <span class="action-spinner"></span>
+        </ng-container>
+        <ng-template #feedbackButtons>
+          <button mat-icon-button (click)="onFeedback(true)" title="This was urgent" class="action-btn">👍</button>
+          <button mat-icon-button (click)="onFeedback(false)" title="Not urgent" class="action-btn">👎</button>
+        </ng-template>
       </div>
     </div>
   `,
@@ -187,12 +192,23 @@ import { TruncatePipe } from '../../pipes/truncate.pipe';
           background-color: $border-subtle;
         }
       }
+      
+      .action-spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba($border-subtle, 0.5);
+        border-radius: 50%;
+        border-top-color: $border-focus;
+        animation: spin 600ms linear infinite;
+        display: inline-block;
+      }
     }
   `]
 })
 export class TriageCardComponent {
   @Input() item!: TriageItem;
   @Input() highlighted = false;
+  @Input() submitting = false;
 
   @Output() feedbackSubmitted = new EventEmitter<{ id: string; wasUrgent: boolean }>();
 

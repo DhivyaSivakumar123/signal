@@ -20,6 +20,23 @@ export const initialAnalyticsState: AnalyticsState = {
 
 export const analyticsReducer = createReducer(
   initialAnalyticsState,
+  on(AnalyticsActions.loadAnalyticsDashboard, (state) => ({
+    ...state,
+    loading: true,
+    error: null
+  })),
+  on(AnalyticsActions.loadAnalyticsDashboardComplete, (state, { teamLoad, recommendations }) => ({
+    ...state,
+    teamLoad,
+    recommendations,
+    loading: false,
+    error: null
+  })),
+  on(AnalyticsActions.loadAnalyticsDashboardFailure, (state, { error }) => ({
+    ...state,
+    loading: false,
+    error
+  })),
   on(AnalyticsActions.loadTeamLoad, (state) => ({
     ...state,
     loading: true,

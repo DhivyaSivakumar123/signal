@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { selectUser } from '../../state/auth/auth.selectors';
 import { selectIntegrations } from '../../state/integrations/integrations.selectors';
-import { selectPreferences } from '../../state/triage/triage.selectors';
+import { selectIntegrationsLoading } from '../../state/integrations/integrations.selectors';
+import { selectPreferences, selectTriageLoading } from '../../state/triage/triage.selectors';
 import { IntegrationsActions } from '../../state/integrations/integrations.actions';
 import { TriageActions } from '../../state/triage/triage.actions';
 import { AccountComponent } from './components/account.component';
@@ -28,8 +29,8 @@ import { FocusPreferencesComponent } from './components/focus-preferences.compon
       
       <div class="settings-content">
         <app-account-settings [user]="user$ | async"></app-account-settings>
-        <app-connected-tools [integrations]="(integrations$ | async) || []"></app-connected-tools>
-        <app-focus-preferences-settings [preferences]="preferences$ | async"></app-focus-preferences-settings>
+        <app-connected-tools [integrations]="(integrations$ | async) || []" [loading]="(integrationsLoading$ | async) ?? false"></app-connected-tools>
+        <app-focus-preferences-settings [preferences]="preferences$ | async" [saving]="(savingPreferences$ | async) ?? false"></app-focus-preferences-settings>
       </div>
     </div>
   `,
@@ -74,6 +75,8 @@ export class SettingsComponent implements OnInit {
   user$ = this.store.select(selectUser);
   integrations$ = this.store.select(selectIntegrations);
   preferences$ = this.store.select(selectPreferences);
+  integrationsLoading$ = this.store.select(selectIntegrationsLoading);
+  savingPreferences$ = this.store.select(selectTriageLoading);
 
   ngOnInit(): void {
     this.store.dispatch(IntegrationsActions.loadIntegrations());

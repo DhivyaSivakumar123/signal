@@ -1,5 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { AuthActions } from './state/auth/auth.actions';
+import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -8,6 +11,13 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
-  title = 'frontend';
+export class AppComponent implements OnInit {
+  private store = inject(Store);
+  private authService = inject(AuthService);
+
+  ngOnInit(): void {
+    if (this.authService.getAccessToken()) {
+      this.store.dispatch(AuthActions.loadCurrentUser());
+    }
+  }
 }

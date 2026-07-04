@@ -1,6 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import { TriageActions } from './triage.actions';
-import { TriageItem, FocusSlot, UserPreference } from '../../core/models/triage.model';
+import { TriageItem, FocusSlot, UserPreference, TriageStatus } from '../../core/models/triage.model';
 
 export interface TriageState {
   items: TriageItem[];
@@ -10,6 +10,7 @@ export interface TriageState {
   loading: boolean;
   lastUpdated: string | null;
   error: string | null;
+  submittingFeedback: string[];
 }
 
 export const initialTriageState: TriageState = {
@@ -19,7 +20,8 @@ export const initialTriageState: TriageState = {
   preferences: null,
   loading: false,
   lastUpdated: null,
-  error: null
+  error: null,
+  submittingFeedback: []
 };
 
 const urgencyWeights: Record<string, number> = {
@@ -28,6 +30,20 @@ const urgencyWeights: Record<string, number> = {
   'THIS_WEEK': 2,
   'FYI': 3
 };
+
+const PRESERVED_STATUSES: TriageStatus[] = ['FEEDBACK_WAS_URGENT', 'FEEDBACK_NOT_URGENT'];
+
+function mergeItems(existing: TriageItem[], incoming: TriageItem[]): TriageItem[] {
+  const existingMap = new Map(existing.map(i => [i.id, i]));
+  const merged = incoming.map(item => {
+    const existingItem = existingMap.get(item.id);
+    if (existingItem && PRESERVED_STATUSES.includes(existingItem.status)) {
+      return { ...item, status: existingItem.status };
+    }
+    return item;
+  });
+  return sortTriageItems(merged);
+}
 
 function sortTriageItems(items: TriageItem[]): TriageItem[] {
   return [...items].sort((a, b) => {
@@ -49,7 +65,7 @@ export const triageReducer = createReducer(
   })),
   on(TriageActions.loadTodayFeedSuccess, (state, { items }) => ({
     ...state,
-    items: sortTriageItems(items),
+    items: mergeItems(state.items, items),
     loading: false,
     lastUpdated: new Date().toISOString(),
     error: null
@@ -61,15 +77,45 @@ export const triageReducer = createReducer(
   })),
   on(TriageActions.loadFocusSlotsSuccess, (state, { slots }) => ({
     ...state,
-    focusSlots: slots
+    focusSlots: slots,
+    loading: false,
+    error: null
+  })),
+  on(TriageActions.loadFocusSlotsFailure, (state, { error }) => ({
+    ...state,
+    loading: false,
+    error
   })),
   on(TriageActions.loadPreferencesSuccess, (state, { prefs }) => ({
     ...state,
-    preferences: prefs
+    preferences: prefs,
+    loading: false,
+    error: null
+  })),
+  on(TriageActions.loadPreferencesFailure, (state, { error }) => ({
+    ...state,
+    loading: false,
+    error
   })),
   on(TriageActions.updatePreferencesSuccess, (state, { prefs }) => ({
     ...state,
-    preferences: prefs
+    preferences: prefs,
+    loading: false,
+    error: null
+  })),
+  on(TriageActions.updatePreferencesFailure, (state, { error }) => ({
+    ...state,
+    loading: false,
+    error
+  })),
+  on(TriageActions.submitFeedback, (state, { id }) => ({
+    ...state,
+    submittingFeedback: [...state.submittingFeedback, id]
+  })),
+  on(TriageActions.submitFeedbackFailure, (state, { id, error }) => ({
+    ...state,
+    submittingFeedback: state.submittingFeedback.filter(sid => sid !== id),
+    error
   })),
   on(TriageActions.submitFeedbackSuccess, (state, { id, wasUrgent }) => {
     const updatedItems = state.items.map((item) => {
@@ -83,7 +129,8 @@ export const triageReducer = createReducer(
     });
     return {
       ...state,
-      items: updatedItems
+      items: updatedItems,
+      submittingFeedback: state.submittingFeedback.filter(sid => sid !== id)
     };
   }),
   on(TriageActions.selectFocusSlot, (state, { slot }) => ({

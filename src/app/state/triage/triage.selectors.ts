@@ -53,3 +53,8 @@ export const selectSelectedSlot = createSelector(
   selectTriageState,
   (state) => state.selectedSlot
 );
+
+export const selectSubmittingFeedback = createSelector(
+  selectTriageState,
+  (state) => state.submittingFeedback
+);

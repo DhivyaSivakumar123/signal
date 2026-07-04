@@ -2,11 +2,11 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { Subscription, combineLatest } from 'rxjs';
+import { Subscription, combineLatest, map } from 'rxjs';
 import { selectUser } from '../../state/auth/auth.selectors';
 import { selectActiveIntegrations, selectIntegrations } from '../../state/integrations/integrations.selectors';
 import { IntegrationsActions } from '../../state/integrations/integrations.actions';
-import { 
+  import { 
   selectTriageItems, 
   selectTriageLoading, 
   selectSelectedSlot,
@@ -14,7 +14,8 @@ import {
   selectNowCount,
   selectTodayCount,
   selectWeekCount,
-  selectFyiCount
+  selectFyiCount,
+  selectSubmittingFeedback
 } from '../../state/triage/triage.selectors';
 import { TriageActions } from '../../state/triage/triage.actions';
 import { TriageService } from '../../core/services/triage.service';
@@ -55,13 +56,14 @@ import { TriageItem, UserPreference } from '../../core/models/triage.model';
 
         <!-- Feed Content -->
         <div class="feed-content">
-          <ng-container *ngIf="hasItems(); else emptyFeed">
+          <ng-container *ngIf="hasItems$ | async; else emptyFeed">
             <!-- NOW Section -->
             <app-triage-section 
               title="Now" 
               [items]="getFilteredItems('NOW', (items$ | async) || [])" 
               [selectedSlot]="selectedSlot$ | async"
               [hasHighlightsInFeed]="hasHighlightsInFeed"
+              [submittingItemIds]="(submittingItemIds$ | async) || []"
               (feedback)="onFeedback($event)">
             </app-triage-section>
 
@@ -71,6 +73,7 @@ import { TriageItem, UserPreference } from '../../core/models/triage.model';
               [items]="getFilteredItems('TODAY', (items$ | async) || [])" 
               [selectedSlot]="selectedSlot$ | async"
               [hasHighlightsInFeed]="hasHighlightsInFeed"
+              [submittingItemIds]="(submittingItemIds$ | async) || []"
               (feedback)="onFeedback($event)">
             </app-triage-section>
 
@@ -80,6 +83,7 @@ import { TriageItem, UserPreference } from '../../core/models/triage.model';
               [items]="getFilteredItems('THIS_WEEK', (items$ | async) || [])" 
               [selectedSlot]="selectedSlot$ | async"
               [hasHighlightsInFeed]="hasHighlightsInFeed"
+              [submittingItemIds]="(submittingItemIds$ | async) || []"
               (feedback)="onFeedback($event)">
             </app-triage-section>
 
@@ -89,6 +93,7 @@ import { TriageItem, UserPreference } from '../../core/models/triage.model';
               [items]="getFilteredItems('FYI', (items$ | async) || [])" 
               [selectedSlot]="selectedSlot$ | async"
               [hasHighlightsInFeed]="hasHighlightsInFeed"
+              [submittingItemIds]="(submittingItemIds$ | async) || []"
               (feedback)="onFeedback($event)">
             </app-triage-section>
           </ng-container>
@@ -409,6 +414,8 @@ export class TriageComponent implements OnInit, OnDestroy {
   todayCount$ = this.store.select(selectTodayCount);
   weekCount$ = this.store.select(selectWeekCount);
   fyiCount$ = this.store.select(selectFyiCount);
+  hasItems$ = this.items$.pipe(map(items => items.length > 0));
+  submittingItemIds$ = this.store.select(selectSubmittingFeedback);
 
   // Pref form bindings
   statedPriorities = '';
@@ -472,12 +479,6 @@ export class TriageComponent implements OnInit, OnDestroy {
     // Stop polling and unsubscribe
     this.store.dispatch(TriageActions.stopPolling());
     this.sub.unsubscribe();
-  }
-
-  hasItems(): boolean {
-    let count = 0;
-    this.items$.subscribe(items => count = items.length).unsubscribe();
-    return count > 0;
   }
 
   getFilteredItems(urgency: 'NOW' | 'TODAY' | 'THIS_WEEK' | 'FYI', items: TriageItem[]): TriageItem[] {

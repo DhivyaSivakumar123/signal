@@ -5,6 +5,7 @@ export interface ToastData {
   id: string;
   message: string;
   type: 'success' | 'error' | 'info';
+  persist?: boolean;
 }
 
 @Component({
@@ -92,22 +93,31 @@ export interface ToastData {
 })
 export class ToastContainerComponent {
   toasts = signal<ToastData[]>([]);
+  onEmpty: (() => void) | null = null;
 
-  add(message: string, type: 'success' | 'error' | 'info'): string {
+  add(message: string, type: 'success' | 'error' | 'info', persist = false): string {
     const id = Math.random().toString(36).substring(2, 9);
     this.toasts.update(current => {
-      const next = [...current, { id, message, type }];
+      const next = [...current, { id, message, type, persist }];
       if (next.length > 3) {
         next.shift();
       }
       return next;
     });
 
-    setTimeout(() => this.remove(id), 3000);
+    if (!persist) {
+      setTimeout(() => this.remove(id), 3000);
+    }
     return id;
   }
 
   remove(id: string): void {
-    this.toasts.update(current => current.filter(t => t.id !== id));
+    this.toasts.update(current => {
+      const next = current.filter(t => t.id !== id);
+      if (next.length === 0 && this.onEmpty) {
+        this.onEmpty();
+      }
+      return next;
+    });
   }
 }
