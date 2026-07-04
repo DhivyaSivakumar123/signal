@@ -50,5 +50,21 @@ export const integrationsReducer = createReducer(
     ...state,
     loading: false,
     error
+  })),
+  on(IntegrationsActions.connectIntegration, (state) => ({
+    ...state,
+    loading: true,
+    error: null
+  })),
+  on(IntegrationsActions.connectIntegrationSuccess, (state, { integration }) => ({
+    ...state,
+    integrations: [...state.integrations.filter(i => i.provider !== integration.provider), integration],
+    loading: false,
+    error: null
+  })),
+  on(IntegrationsActions.connectIntegrationFailure, (state, { error }) => ({
+    ...state,
+    loading: false,
+    error
   }))
 );

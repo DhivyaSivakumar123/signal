@@ -9,6 +9,9 @@ export const IntegrationsActions = createActionGroup({
     'Load Integrations Failure': props<{ error: string }>(),
     'Delete Integration': props<{ id: string }>(),
     'Delete Integration Success': props<{ id: string }>(),
-    'Delete Integration Failure': props<{ error: string }>()
+    'Delete Integration Failure': props<{ error: string }>(),
+    'Connect Integration': props<{ provider: string }>(),
+    'Connect Integration Success': props<{ integration: Integration }>(),
+    'Connect Integration Failure': props<{ error: string }>()
   }
 });

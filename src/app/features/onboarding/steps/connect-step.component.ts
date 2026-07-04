@@ -1,7 +1,9 @@
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Store } from '@ngrx/store';
 import { Integration, Provider } from '../../../core/models/integration.model';
 import { IntegrationService } from '../../../core/services/integration.service';
+import { IntegrationsActions } from '../../../state/integrations/integrations.actions';
 import { SourceIconComponent } from '../../../shared/components/source-icon/source-icon.component';
 
 @Component({
@@ -238,6 +240,7 @@ export class ConnectStepComponent {
   @Input() activeIntegrations: Integration[] = [];
   @Output() next = new EventEmitter<void>();
 
+  private store = inject(Store);
   private integrationService = inject(IntegrationService);
 
   isConnected(provider: Provider): boolean {
@@ -249,19 +252,6 @@ export class ConnectStepComponent {
   }
 
   connect(provider: Provider): void {
-    switch (provider) {
-      case 'SLACK':
-        this.integrationService.connectSlack();
-        break;
-      case 'GMAIL':
-        this.integrationService.connectGmail();
-        break;
-      case 'OUTLOOK':
-        this.integrationService.connectOutlook();
-        break;
-      case 'CALENDAR':
-        this.integrationService.connectCalendar();
-        break;
-    }
+    this.store.dispatch(IntegrationsActions.connectIntegration({ provider }));
   }
 }

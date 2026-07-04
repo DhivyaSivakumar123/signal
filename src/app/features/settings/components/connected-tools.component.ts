@@ -30,7 +30,12 @@ import { SourceIconComponent } from '../../../shared/components/source-icon/sour
                     (click)="connect(t.provider)">
               Connect
             </button>
-            <button *ngIf="getActiveStatus(t.provider) !== 'Disconnected'" 
+            <button *ngIf="getActiveStatus(t.provider) === 'EXPIRED' || getActiveStatus(t.provider) === 'REVOKED'" 
+                    class="btn btn--connect" 
+                    (click)="connect(t.provider)">
+              Reconnect
+            </button>
+            <button *ngIf="getActiveStatus(t.provider) === 'ACTIVE'" 
                     class="btn btn--disconnect" 
                     [disabled]="loading"
                     (click)="disconnect(t.provider)">
@@ -174,12 +179,7 @@ export class ConnectedToolsComponent {
   }
 
   connect(provider: Provider): void {
-    switch (provider) {
-      case 'SLACK': this.integrationService.connectSlack(); break;
-      case 'GMAIL': this.integrationService.connectGmail(); break;
-      case 'OUTLOOK': this.integrationService.connectOutlook(); break;
-      case 'CALENDAR': this.integrationService.connectCalendar(); break;
-    }
+    this.store.dispatch(IntegrationsActions.connectIntegration({ provider }));
   }
 
   disconnect(provider: Provider): void {

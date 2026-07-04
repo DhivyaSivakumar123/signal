@@ -52,4 +52,32 @@ export class IntegrationsEffects {
       map(() => IntegrationsActions.loadIntegrations())
     )
   );
+
+  connectIntegration$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(IntegrationsActions.connectIntegration),
+      switchMap(({ provider }) => {
+        let connectObs;
+        switch (provider) {
+          case 'SLACK': connectObs = this.integrationService.connectSlack(); break;
+          case 'GMAIL': connectObs = this.integrationService.connectGmail(); break;
+          case 'OUTLOOK': connectObs = this.integrationService.connectOutlook(); break;
+          case 'CALENDAR': connectObs = this.integrationService.connectCalendar(); break;
+          default: throw new Error(`Unknown provider: ${provider}`);
+        }
+        return connectObs.pipe(
+          tap((integration) => this.toastService.success(`Connected ${integration.provider}`)),
+          map((integration) => IntegrationsActions.connectIntegrationSuccess({ integration })),
+          catchError((error) => of(IntegrationsActions.connectIntegrationFailure({ error: error.message })))
+        );
+      })
+    )
+  );
+
+  connectIntegrationSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(IntegrationsActions.connectIntegrationSuccess),
+      map(() => IntegrationsActions.loadIntegrations())
+    )
+  );
 }
