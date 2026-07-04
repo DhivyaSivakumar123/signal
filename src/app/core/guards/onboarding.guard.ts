@@ -9,6 +9,10 @@ export const onboardingGuard: CanActivateFn = (route, state) => {
   const store = inject(Store);
   const router = inject(Router);
 
+  if (localStorage.getItem('onboarding_completed') === 'true') {
+    return true;
+  }
+
   if (!store.select) return true;
 
   store.dispatch(IntegrationsActions.loadIntegrations());

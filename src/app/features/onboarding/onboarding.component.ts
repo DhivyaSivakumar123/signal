@@ -111,6 +111,7 @@ export class OnboardingComponent implements OnInit {
   }
 
   onFinish(): void {
+    localStorage.setItem('onboarding_completed', 'true');
     this.router.navigate(['/app/triage']);
   }
 }
