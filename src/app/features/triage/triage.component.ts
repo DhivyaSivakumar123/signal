@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Subscription, combineLatest, map } from 'rxjs';
 import { selectUser } from '../../state/auth/auth.selectors';
-import { selectActiveIntegrations, selectIntegrations } from '../../state/integrations/integrations.selectors';
+import { selectActiveIntegrations, selectIntegrations, selectIntegrationsLoading } from '../../state/integrations/integrations.selectors';
 import { IntegrationsActions } from '../../state/integrations/integrations.actions';
   import { 
   selectTriageItems, 
@@ -47,9 +47,9 @@ import { TriageItem, UserPreference } from '../../core/models/triage.model';
             </p>
           </div>
           <div class="header-right">
-            <div class="sync-indicator">
-              <span class="spinner" *ngIf="loading$ | async"></span>
-              <span class="sync-text">{{ (loading$ | async) ? 'Syncing...' : 'Synced just now' }}</span>
+            <div class="sync-indicator" (click)="onSyncClick()" style="cursor: pointer;" title="Click to sync integrations now">
+              <span class="spinner" *ngIf="(loading$ | async) || (syncing$ | async)"></span>
+              <span class="sync-text">{{ ((loading$ | async) || (syncing$ | async)) ? 'Syncing...' : 'Sync Now' }}</span>
             </div>
           </div>
         </header>
@@ -214,6 +214,16 @@ import { TriageItem, UserPreference } from '../../core/models/triage.model';
       color: $text-muted;
       font-family: $font-body;
       font-size: $text-xs;
+      padding: $space-1 $space-2;
+      border-radius: $radius-md;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: $text-secondary;
+      }
     }
     
     .spinner {
@@ -409,6 +419,7 @@ export class TriageComponent implements OnInit, OnDestroy {
   loading$ = this.store.select(selectTriageLoading);
   selectedSlot$ = this.store.select(selectSelectedSlot);
   integrations$ = this.store.select(selectIntegrations);
+  syncing$ = this.store.select(selectIntegrationsLoading);
 
   nowCount$ = this.store.select(selectNowCount);
   todayCount$ = this.store.select(selectTodayCount);
@@ -507,5 +518,9 @@ export class TriageComponent implements OnInit, OnDestroy {
         this.toastService.error('Failed to send digest.');
       }
     });
+  }
+
+  onSyncClick(): void {
+    this.store.dispatch(IntegrationsActions.syncIntegrations());
   }
 }

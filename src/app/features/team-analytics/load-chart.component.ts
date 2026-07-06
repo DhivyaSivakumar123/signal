@@ -1,8 +1,31 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BaseChartDirective } from 'ng2-charts';
-import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import {
+  Chart,
+  ChartConfiguration,
+  ChartData,
+  ChartType,
+  CategoryScale,
+  LinearScale,
+  BarController,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js';
 import { TeamLoad } from '../../core/models/analytics.model';
+
+// Register all required Chart.js components (required with tree-shaking in v3+)
+Chart.register(
+  CategoryScale,
+  LinearScale,
+  BarController,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 @Component({
   selector: 'app-load-chart',

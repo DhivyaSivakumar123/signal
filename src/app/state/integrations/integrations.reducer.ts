@@ -66,5 +66,20 @@ export const integrationsReducer = createReducer(
     ...state,
     loading: false,
     error
+  })),
+  on(IntegrationsActions.syncIntegrations, (state) => ({
+    ...state,
+    loading: true,
+    error: null
+  })),
+  on(IntegrationsActions.syncIntegrationsSuccess, (state) => ({
+    ...state,
+    loading: false,
+    error: null
+  })),
+  on(IntegrationsActions.syncIntegrationsFailure, (state, { error }) => ({
+    ...state,
+    loading: false,
+    error
   }))
 );

@@ -6,6 +6,7 @@ import { ToastService } from '../../shared/components/toast/toast.service';
 import { IntegrationsActions } from './integrations.actions';
 import { selectIntegrations } from './integrations.selectors';
 import { catchError, first, map, of, switchMap, tap } from 'rxjs';
+import { TriageActions } from '../triage/triage.actions';
 
 @Injectable()
 export class IntegrationsEffects {
@@ -78,6 +79,32 @@ export class IntegrationsEffects {
     this.actions$.pipe(
       ofType(IntegrationsActions.connectIntegrationSuccess),
       map(() => IntegrationsActions.loadIntegrations())
+    )
+  );
+
+  syncIntegrations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(IntegrationsActions.syncIntegrations),
+      switchMap(() =>
+        this.integrationService.syncIntegrations().pipe(
+          tap(() => this.toastService.success('Sync complete. Updates should appear shortly.')),
+          map(() => IntegrationsActions.syncIntegrationsSuccess()),
+          catchError((error) => {
+            this.toastService.error(`Sync failed: ${error.message}`);
+            return of(IntegrationsActions.syncIntegrationsFailure({ error: error.message }));
+          })
+        )
+      )
+    )
+  );
+
+  syncIntegrationsSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(IntegrationsActions.syncIntegrationsSuccess),
+      switchMap(() => [
+        TriageActions.loadTodayFeed(),
+        IntegrationsActions.loadIntegrations()
+      ])
     )
   );
 }

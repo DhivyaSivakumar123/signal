@@ -38,4 +38,8 @@ export class IntegrationService {
   deleteIntegration(id: string): Observable<void> {
     return this.http.delete<void>(`${environment.apiUrl}/api/integrations/${id}`);
   }
+
+  syncIntegrations(): Observable<void> {
+    return this.http.post<void>(`${environment.apiUrl}/api/integrations/sync`, {});
+  }
 }
