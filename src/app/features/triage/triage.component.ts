@@ -215,7 +215,7 @@ import { TriageItem, UserPreference } from '../../core/models/triage.model';
       font-family: $font-body;
       font-size: $text-xs;
       padding: $space-1 $space-2;
-      border-radius: $radius-md;
+      border-radius: $radius-badge;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.05);
       transition: all 0.2s ease;
