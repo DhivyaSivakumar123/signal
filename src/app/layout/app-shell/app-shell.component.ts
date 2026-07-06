@@ -45,7 +45,7 @@ import { TopbarComponent } from '../topbar/topbar.component';
     .shell__content-container {
       flex: 1;
       overflow: hidden;
-      padding: 0 $space-6 $space-6 0; /* Creates margins around the container matching Drive */
+      padding: $space-2 $space-4 $space-4 $space-3; /* Top: 8px, Right: 16px, Bottom: 16px, Left: 12px gap matching Drive */
       background: $sidebar-bg;
     }
     .shell__main {

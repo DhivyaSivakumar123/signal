@@ -162,8 +162,8 @@ import { FocusSlot } from '../../core/models/triage.model';
 
       &--active {
         background: $sidebar-item-active;
-        color: $text-primary;
-        .sidebar__icon { color: $urgency-week-accent; }
+        color: #8ab4f8;
+        .sidebar__icon { color: #8ab4f8; }
       }
     }
 

@@ -16,9 +16,9 @@ $weight-medium:   500;
 $weight-semibold: 600;
 
 // ─── Backgrounds ───
-$bg-base:     #0F1117;   // app background
-$bg-surface:  #181C26;   // card/panel
-$bg-elevated: #1F2435;   // hover, dropdowns
+$bg-base:     #131314;   // app background (charcoal grey)
+$bg-surface:  #1e1f20;   // card/panel (Drive inner container)
+$bg-elevated: #2c2d30;   // hover, dropdowns
 
 // ─── Urgency tinting (SIGNATURE ELEMENT — applied to entire card background) ───
 $urgency-now-bg:       #2A1A1A;
@@ -31,9 +31,9 @@ $urgency-fyi-bg:       #161A1F;
 $urgency-fyi-accent:   #6B7280;
 
 // ─── Text ───
-$text-primary:   #F0F2F5;
-$text-secondary: #8B92A0;
-$text-muted:     #4B5563;
+$text-primary:   #E3E3E3;
+$text-secondary: #C4C7C5;
+$text-muted:     #8E918F;
 
 // ─── Source brand colors (source icons only) ───
 $slack-color:    #4A154B;
@@ -42,39 +42,39 @@ $outlook-color:  #0078D4;
 $calendar-color: #34A853;
 
 // ─── Structure ───
-$border-subtle: #252A38;
-$border-focus:  #4A90D9;
+$border-subtle: rgba(255, 255, 255, 0.08);
+$border-focus:  #8ab4f8;
 
 // ─── Spacing (8px grid) ───
 $space-1: 4px;  $space-2: 8px;   $space-3: 12px;  $space-4: 16px;
 $space-5: 20px; $space-6: 24px;  $space-8: 32px;  $space-10: 40px;
 
 // ─── Shape ───
-$radius-card:  6px;
-$radius-badge: 4px;
+$radius-card:  16px;
+$radius-badge: 8px;
 
 // ─── Layout ───
 $sidebar-width:       240px;
-$sidebar-collapsed:   64px;
+$sidebar-collapsed:   72px;
 $topbar-height:       64px;
 
 // ─── List row ───
 $row-height:          48px;
-$row-hover-bg:        #1F2435;
-$row-selected-bg:     #1A2440;
-$row-border:          1px solid #252A38;
+$row-hover-bg:        rgba(255, 255, 255, 0.04);
+$row-selected-bg:     rgba(138, 180, 248, 0.08);
+$row-border:          1px solid rgba(255, 255, 255, 0.08);
 
 // ─── Sidebar ───
-$sidebar-bg:          #13161F;
-$sidebar-item-active: #1F2A45;
-$sidebar-item-hover:  #1A1F2E;
+$sidebar-bg:          #131314;
+$sidebar-item-active: rgba(138, 180, 248, 0.12);
+$sidebar-item-hover:  rgba(255, 255, 255, 0.04);
 
 // ─── Topbar ───
-$topbar-bg:           #0F1117;
-$topbar-border:       1px solid #252A38;
+$topbar-bg:           #131314;
+$topbar-border:       none;
 
 // ─── Search ───
-$search-bg:           #181C26;
-$search-focus-bg:     #1F2435;
-$search-border:       1px solid #252A38;
-$search-focus-border: 1px solid #4A90D9;
+$search-bg:           #2c2d30;
+$search-focus-bg:     #2c2d30;
+$search-border:       none;
+$search-focus-border: 1px solid rgba(255, 255, 255, 0.1);
