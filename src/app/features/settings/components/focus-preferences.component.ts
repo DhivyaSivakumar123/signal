@@ -12,10 +12,7 @@ import { selectPreferences, selectTriageLoading } from '../../../state/triage/tr
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="card">
-      <h3 class="card-title">Focus & Digest Preferences</h3>
-      <p class="card-subtitle">Set your priority guidelines and digest delivery preferences.</p>
-      
+    <div class="preferences-form">
       <div class="form-group">
         <label class="form-label">Stated Priorities</label>
         <textarea class="form-textarea" 
@@ -49,23 +46,8 @@ import { selectPreferences, selectTriageLoading } from '../../../state/triage/tr
   styles: [`
     @import 'styles/tokens';
     
-    .card {
+    .preferences-form {
       padding: $space-6;
-    }
-    
-    .card-title {
-      font-family: $font-display;
-      font-size: $text-base;
-      color: $text-primary;
-      font-weight: $weight-semibold;
-      margin-bottom: $space-1;
-    }
-    
-    .card-subtitle {
-      font-family: $font-body;
-      font-size: $text-xs;
-      color: $text-secondary;
-      margin-bottom: $space-5;
     }
     
     .form-group {

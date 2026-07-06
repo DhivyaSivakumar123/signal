@@ -27,6 +27,7 @@ import { UrgencyBadgeComponent } from '../../shared/components/urgency-badge/urg
 import { TriageItem, FocusSlot } from '../../core/models/triage.model';
 import { TruncatePipe } from '../../shared/pipes/truncate.pipe';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TopbarComponent } from '../../layout/topbar/topbar.component';
 
 @Component({
@@ -40,7 +41,8 @@ import { TopbarComponent } from '../../layout/topbar/topbar.component';
     SourceIconComponent,
     UrgencyBadgeComponent,
     TruncatePipe,
-    MatIconModule
+    MatIconModule,
+    MatTooltipModule
   ],
   template: `
     <div class="triage">
@@ -172,7 +174,7 @@ import { TopbarComponent } from '../../layout/topbar/topbar.component';
       display: flex;
       align-items: center;
       gap: $space-3;
-      background: $bg-surface;
+      background: $bg-elevated;
       border: 1px solid $border-subtle;
       border-radius: $radius-card;
       padding: $space-3 $space-4;
@@ -181,7 +183,7 @@ import { TopbarComponent } from '../../layout/topbar/topbar.component';
       min-width: 220px;
       max-width: 340px;
       transition: background 180ms ease;
-      &:hover { background: $bg-elevated; }
+      &:hover { background: rgba(255, 255, 255, 0.05); }
     }
     .suggested__card-body { flex: 1; overflow: hidden; }
     .suggested__sender  { display: block; font-size: $text-sm; color: $text-primary; font-weight: $weight-medium; }
@@ -193,7 +195,7 @@ import { TopbarComponent } from '../../layout/topbar/topbar.component';
       grid-template-columns: 48px 160px 1fr 200px 100px 80px;
       padding: $space-2 $space-6;
       border-bottom: 1px solid $border-subtle;
-      background: $bg-base;
+      background: $bg-surface;
       position: sticky;
       top: 0;
       z-index: 10;

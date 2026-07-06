@@ -10,60 +10,37 @@ import { selectUser } from '../../../state/auth/auth.selectors';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="card" *ngIf="user">
-      <h3 class="card-title">Account Details</h3>
-      <p class="card-subtitle">Your user profile and organization identifiers.</p>
-      
-      <div class="profile-grid">
-        <div class="profile-item">
-          <span class="label">Name</span>
-          <span class="value">{{ user.name }}</span>
-        </div>
-        <div class="profile-item">
-          <span class="label">Email Address</span>
-          <span class="value">{{ user.email }}</span>
-        </div>
-        <div class="profile-item">
-          <span class="label">Organization ID</span>
-          <span class="value font-mono">{{ user.orgId }}</span>
-        </div>
-        <div class="profile-item">
-          <span class="label">Role</span>
-          <span class="value badge">{{ user.role }}</span>
-        </div>
-        <div class="profile-item">
-          <span class="label">Authentication Provider</span>
-          <span class="value">{{ user.oauthProvider | titlecase }}</span>
-        </div>
+    <div class="profile-grid" *ngIf="user">
+      <div class="profile-item">
+        <span class="label">Name</span>
+        <span class="value">{{ user.name }}</span>
+      </div>
+      <div class="profile-item">
+        <span class="label">Email Address</span>
+        <span class="value">{{ user.email }}</span>
+      </div>
+      <div class="profile-item">
+        <span class="label">Organization ID</span>
+        <span class="value font-mono">{{ user.orgId }}</span>
+      </div>
+      <div class="profile-item">
+        <span class="label">Role</span>
+        <span class="value badge">{{ user.role }}</span>
+      </div>
+      <div class="profile-item">
+        <span class="label">Authentication Provider</span>
+        <span class="value">{{ user.oauthProvider | titlecase }}</span>
       </div>
     </div>
   `,
   styles: [`
     @import 'styles/tokens';
     
-    .card {
-      padding: $space-5;
-    }
-    
-    .card-title {
-      font-family: $font-display;
-      font-size: $text-base;
-      color: $text-primary;
-      font-weight: $weight-semibold;
-      margin-bottom: $space-1;
-    }
-    
-    .card-subtitle {
-      font-family: $font-body;
-      font-size: $text-xs;
-      color: $text-secondary;
-      margin-bottom: $space-5;
-    }
-    
     .profile-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: $space-5;
+      padding: $space-6;
     }
     
     .profile-item {

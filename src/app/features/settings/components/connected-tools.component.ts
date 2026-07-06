@@ -12,37 +12,32 @@ import { selectIntegrations, selectIntegrationsLoading } from '../../../state/in
   standalone: true,
   imports: [CommonModule, SourceIconComponent],
   template: `
-    <div class="card">
-      <h3 class="card-title">Connected Tools</h3>
-      <p class="card-subtitle">Connect or disconnect your messaging platforms and calendars.</p>
-      
-      <div class="tools-list">
-        <div class="tool-row" *ngFor="let t of tools">
-          <app-source-icon [provider]="t.provider" class="tool-icon"></app-source-icon>
-          <div class="tool-info">
-            <span class="tool-name">{{ t.label }}</span>
-            <span class="tool-status" [ngClass]="'tool-status--' + (getActiveStatus(t.provider) | lowercase)">
-              {{ getActiveStatus(t.provider) }}
-            </span>
-          </div>
-          <div class="tool-actions">
-            <button *ngIf="getActiveStatus(t.provider) === 'Disconnected'" 
-                    class="btn btn--connect" 
-                    (click)="connect(t.provider)">
-              Connect
-            </button>
-            <button *ngIf="getActiveStatus(t.provider) === 'EXPIRED' || getActiveStatus(t.provider) === 'REVOKED'" 
-                    class="btn btn--connect" 
-                    (click)="connect(t.provider)">
-              Reconnect
-            </button>
-            <button *ngIf="getActiveStatus(t.provider) === 'ACTIVE'" 
-                    class="btn btn--disconnect" 
-                    [disabled]="loading"
-                    (click)="disconnect(t.provider)">
-              {{ loading ? 'Disconnecting...' : 'Disconnect' }}
-            </button>
-          </div>
+    <div class="tools-list">
+      <div class="tool-row" *ngFor="let t of tools">
+        <app-source-icon [provider]="t.provider" class="tool-icon"></app-source-icon>
+        <div class="tool-info">
+          <span class="tool-name">{{ t.label }}</span>
+          <span class="tool-status" [ngClass]="'tool-status--' + (getActiveStatus(t.provider) | lowercase)">
+            {{ getActiveStatus(t.provider) }}
+          </span>
+        </div>
+        <div class="tool-actions">
+          <button *ngIf="getActiveStatus(t.provider) === 'Disconnected'" 
+                  class="btn btn--connect" 
+                  (click)="connect(t.provider)">
+            Connect
+          </button>
+          <button *ngIf="getActiveStatus(t.provider) === 'EXPIRED' || getActiveStatus(t.provider) === 'REVOKED'" 
+                  class="btn btn--connect" 
+                  (click)="connect(t.provider)">
+            Reconnect
+          </button>
+          <button *ngIf="getActiveStatus(t.provider) === 'ACTIVE'" 
+                  class="btn btn--disconnect" 
+                  [disabled]="loading"
+                  (click)="disconnect(t.provider)">
+            {{ loading ? 'Disconnecting...' : 'Disconnect' }}
+          </button>
         </div>
       </div>
     </div>
@@ -50,29 +45,11 @@ import { selectIntegrations, selectIntegrationsLoading } from '../../../state/in
   styles: [`
     @import 'styles/tokens';
     
-    .card {
-      padding: $space-6;
-    }
-    
-    .card-title {
-      font-family: $font-display;
-      font-size: $text-base;
-      color: $text-primary;
-      font-weight: $weight-semibold;
-      margin-bottom: $space-1;
-    }
-    
-    .card-subtitle {
-      font-family: $font-body;
-      font-size: $text-xs;
-      color: $text-secondary;
-      margin-bottom: $space-5;
-    }
-    
     .tools-list {
       display: flex;
       flex-direction: column;
       gap: $space-4;
+      padding: $space-6;
     }
     
     .tool-row {

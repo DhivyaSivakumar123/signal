@@ -2,18 +2,28 @@ import { Component, Input, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { selectFocusSlots, selectSelectedSlot, selectNowCount } from '../../state/triage/triage.selectors';
 import { TriageActions } from '../../state/triage/triage.actions';
+import { IntegrationsActions } from '../../state/integrations/integrations.actions';
 import { FocusSlot } from '../../core/models/triage.model';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule],
+  imports: [CommonModule, RouterModule, MatIconModule, MatTooltipModule],
   template: `
     <nav class="sidebar" [class.sidebar--collapsed]="collapsed">
+
+      <!-- Drive-style "+ Sync Now" Pill Button -->
+      <div class="sidebar__action-container">
+        <button class="sidebar__sync-btn" (click)="triggerSync()" [matTooltip]="collapsed ? 'Sync Now' : ''">
+          <mat-icon class="sync-btn__icon">sync</mat-icon>
+          <span class="sync-btn__label" *ngIf="!collapsed">Sync Now</span>
+        </button>
+      </div>
 
       <!-- Nav items -->
       <ul class="sidebar__nav">
@@ -78,12 +88,59 @@ import { FocusSlot } from '../../core/models/triage.model';
         .sidebar__count,
         .sidebar__section,
         .sidebar__slot-info { display: none; }
+        
+        .sidebar__action-container {
+          justify-content: center;
+          padding: $space-4 0;
+        }
+        .sidebar__sync-btn {
+          padding: $space-3;
+          border-radius: 50%;
+        }
       }
+    }
+
+    .sidebar__action-container {
+      padding: $space-4 $space-4;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .sidebar__sync-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: $space-2;
+      background: $sidebar-item-active;
+      border: 1px solid rgba($border-focus, 0.15);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      color: $text-primary;
+      font-family: $font-body;
+      font-size: $text-sm;
+      font-weight: $weight-medium;
+      padding: $space-3 $space-5;
+      border-radius: 24px;
+      cursor: pointer;
+      transition: all 180ms ease;
+      
+      &:hover {
+        background: lighten(#1F2A45, 5%);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    .sync-btn__icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .sidebar__nav {
       list-style: none;
-      padding: $space-3 $space-2;
+      padding: 0;
       margin: 0;
     }
 
@@ -91,15 +148,15 @@ import { FocusSlot } from '../../core/models/triage.model';
       display: flex;
       align-items: center;
       gap: $space-3;
-      padding: $space-2 $space-3;
-      border-radius: $radius-card;
+      padding: $space-2 $space-4;
+      margin: 2px $space-3;
+      border-radius: 20px;
       cursor: pointer;
       color: $text-secondary;
       font-size: $text-sm;
       font-family: $font-body;
       font-weight: $weight-medium;
       transition: background 180ms ease;
-      margin-bottom: 2px;
 
       &:hover { background: $sidebar-item-hover; color: $text-primary; }
 
@@ -122,7 +179,7 @@ import { FocusSlot } from '../../core/models/triage.model';
       &--now { background: rgba($urgency-now-accent, 0.2); color: $urgency-now-accent; }
     }
 
-    .sidebar__divider { height: 1px; background: $border-subtle; margin: $space-2 $space-3; }
+    .sidebar__divider { height: 1px; background: $border-subtle; margin: $space-3 $space-3; }
 
     .sidebar__section { padding: 0 $space-3 $space-3; }
     .sidebar__section-label {
@@ -140,7 +197,8 @@ import { FocusSlot } from '../../core/models/triage.model';
       display: flex;
       align-items: center;
       gap: $space-2;
-      padding: $space-2;
+      padding: $space-2 $space-3;
+      margin: 2px 0;
       border-radius: $radius-badge;
       cursor: pointer;
       &:hover { background: $sidebar-item-hover; }
@@ -182,5 +240,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
   selectSlot(slot: FocusSlot): void {
     const nextSlot = this.selectedSlot === slot ? null : slot;
     this.store.dispatch(TriageActions.selectFocusSlot({ slot: nextSlot }));
+  }
+
+  triggerSync() {
+    this.store.dispatch(IntegrationsActions.syncIntegrations());
   }
 }

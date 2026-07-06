@@ -5,6 +5,7 @@ import { TriageItem, FocusSlot } from '../../core/models/triage.model';
 import { SourceIconComponent } from '../../shared/components/source-icon/source-icon.component';
 import { RelativeTimePipe } from '../../shared/pipes/relative-time.pipe';
 import { TruncatePipe } from '../../shared/pipes/truncate.pipe';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-triage-section',
@@ -12,6 +13,7 @@ import { TruncatePipe } from '../../shared/pipes/truncate.pipe';
   imports: [
     CommonModule,
     MatIconModule,
+    MatTooltipModule,
     SourceIconComponent,
     RelativeTimePipe,
     TruncatePipe

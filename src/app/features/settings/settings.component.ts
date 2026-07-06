@@ -47,7 +47,7 @@ import { FocusPreferencesComponent } from './components/focus-preferences.compon
       margin: 0 0 $space-6;
     }
     .settings__panel {
-      background: $bg-surface;
+      background: $bg-elevated;
       border: 1px solid $border-subtle;
       border-radius: $radius-card;
       overflow: hidden;
@@ -56,11 +56,12 @@ import { FocusPreferencesComponent } from './components/focus-preferences.compon
     .settings__panel-header {
       font-family: $font-display;
       font-size: $text-xs;
-      color: $text-muted;
+      color: $text-primary;
+      font-weight: $weight-semibold;
       letter-spacing: 1px;
       padding: $space-4 $space-6;
       border-bottom: 1px solid $border-subtle;
-      background: $bg-base;
+      background: rgba(255, 255, 255, 0.02);
     }
   `]
 })

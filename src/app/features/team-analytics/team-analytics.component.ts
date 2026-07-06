@@ -71,7 +71,7 @@ import { MatIconModule } from '@angular/material/icon';
       margin: 0;
     }
     .analytics__panel {
-      background: $bg-surface;
+      background: $bg-elevated;
       border: 1px solid $border-subtle;
       border-radius: $radius-card;
       padding: $space-6;
