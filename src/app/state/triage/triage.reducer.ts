@@ -33,14 +33,41 @@ const urgencyWeights: Record<string, number> = {
 
 const PRESERVED_STATUSES: TriageStatus[] = ['FEEDBACK_WAS_URGENT', 'FEEDBACK_NOT_URGENT'];
 
-function mergeItems(existing: TriageItem[], incoming: TriageItem[]): TriageItem[] {
+function mergeItems(existing: TriageItem[], incoming: any[]): TriageItem[] {
   const existingMap = new Map(existing.map(i => [i.id, i]));
   const merged = incoming.map(item => {
+    const sourceVal = item.source || 'GMAIL';
+    const sourcesVal = item.sources && item.sources.length > 0 ? item.sources : [sourceVal];
+    
+    let sName = item.senderName;
+    if (!sName && item.senderId) {
+      if (item.senderId.includes('@')) {
+        sName = item.senderId.split('@')[0];
+        sName = sName.replace(/[._-]/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+      } else {
+        sName = item.senderId;
+      }
+    }
+    if (!sName) sName = 'Automated Sender';
+
+    let subPreview = item.subjectOrPreview;
+    if (!subPreview) {
+      subPreview = item.reasonSnippet || 'No Subject';
+    }
+
+    const enrichedItem: TriageItem = {
+      ...item,
+      sources: sourcesVal,
+      senderName: sName,
+      subjectOrPreview: subPreview,
+      reasonSnippet: item.reasonSnippet || 'Auto-categorized message'
+    };
+
     const existingItem = existingMap.get(item.id);
     if (existingItem && PRESERVED_STATUSES.includes(existingItem.status)) {
-      return { ...item, status: existingItem.status };
+      return { ...enrichedItem, status: existingItem.status };
     }
-    return item;
+    return enrichedItem;
   });
   return sortTriageItems(merged);
 }

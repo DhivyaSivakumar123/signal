@@ -39,7 +39,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
           [id]="'item-' + item.id"
           [class.section__row--highlighted]="isHighlighted(item)"
           [class.section__row--dimmed]="item.status === 'DISMISSED' || item.status === 'SEEN'"
-          [class]="'section__row section__row--' + item.urgency.toLowerCase()"
+          [ngClass]="'section__row--' + item.urgency.toLowerCase()"
         >
           <!-- Source icons -->
           <div class="row__sources">
