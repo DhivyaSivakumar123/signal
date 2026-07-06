@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
-import { Subscription, combineLatest } from 'rxjs';
+import { Subscription, combineLatest, first } from 'rxjs';
 import { selectUser } from '../../state/auth/auth.selectors';
 import { 
   selectTeamLoad, 
@@ -12,181 +12,88 @@ import {
 import { AnalyticsActions } from '../../state/analytics/analytics.actions';
 import { LoadChartComponent } from './load-chart.component';
 import { RecommendationsComponent } from './recommendations.component';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-team-analytics',
   standalone: true,
-  imports: [CommonModule, LoadChartComponent, RecommendationsComponent],
+  imports: [
+    CommonModule,
+    LoadChartComponent,
+    RecommendationsComponent,
+    MatButtonToggleModule,
+    MatIconModule
+  ],
   template: `
-    <div class="analytics-container">
-      <ng-container *ngIf="user$ | async as user">
-        <!-- Security Check: MANAGER role required -->
-        <ng-container *ngIf="user.role === 'MANAGER'; else accessDenied">
-          <header class="analytics-header">
-            <div class="header-left">
-              <h1 class="title">Team Communication Load</h1>
-              <p class="subtitle">Understand workload trends and stress points across your team.</p>
-            </div>
-            <div class="header-right">
-              <select class="filter-select" 
-                      [value]="daysFilter$ | async" 
-                      (change)="onFilterChange($event, user.id)">
-                <option [value]="7">Last 7 Days</option>
-                <option [value]="30">Last 30 Days</option>
-              </select>
-            </div>
-          </header>
+    <div class="analytics">
+      <div class="analytics__header">
+        <h1 class="analytics__title">Team Load</h1>
+        <mat-button-toggle-group [(value)]="daysFilter" (change)="onDaysChange($event)">
+          <mat-button-toggle value="7">Last 7 days</mat-button-toggle>
+          <mat-button-toggle value="30">Last 30 days</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
 
-          <div class="analytics-grid">
-            <div class="chart-card">
-              <div class="card-header">
-                <h3 class="card-title">Message Volume by Hour</h3>
-                <span class="spinner" *ngIf="loading$ | async"></span>
-              </div>
-              <app-load-chart [data]="teamLoad$ | async"></app-load-chart>
-            </div>
+      <!-- Chart panel -->
+      <div class="analytics__panel">
+        <div class="panel__title">Interruptions by source and hour</div>
+        <app-load-chart [teamLoad]="teamLoad" />
+      </div>
 
-            <app-recommendations [recommendations]="(recommendations$ | async) || []"></app-recommendations>
-          </div>
-        </ng-container>
+      <!-- Recommendations panel -->
+      <div class="analytics__panel">
+        <div class="panel__title">Recommendations</div>
+        <app-recommendations [recommendations]="recommendations" />
+      </div>
 
-        <ng-template #accessDenied>
-          <div class="access-denied-container">
-            <div class="error-banner">
-              <div class="error-banner__icon">🔒</div>
-              <h2 class="error-banner__title">Access Denied</h2>
-              <p class="error-banner__text">Team Analytics are only available to Managers.</p>
-            </div>
-          </div>
-        </ng-template>
-      </ng-container>
+      <!-- Privacy note — always visible, non-removable -->
+      <p class="analytics__privacy">
+        <mat-icon>lock</mat-icon>
+        Signal shows your team's total volume only. Individual messages are never visible here.
+      </p>
     </div>
   `,
   styles: [`
     @import 'styles/tokens';
-    
-    .analytics-container {
-      padding: $space-6;
-      flex: 1;
+
+    .analytics { padding: $space-6; max-width: 960px; }
+    .analytics__header {
       display: flex;
-      flex-direction: column;
-    }
-    
-    .analytics-header {
-      display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
       margin-bottom: $space-6;
     }
-    
-    .title {
+    .analytics__title {
       font-family: $font-display;
       font-size: $text-xl;
       color: $text-primary;
-      font-weight: $weight-semibold;
-      margin-bottom: $space-1;
+      margin: 0;
     }
-    
-    .subtitle {
-      font-family: $font-body;
-      font-size: $text-sm;
-      color: $text-secondary;
-    }
-    
-    .filter-select {
-      font-family: $font-body;
-      font-size: $text-sm;
-      background-color: $bg-surface;
+    .analytics__panel {
+      background: $bg-surface;
       border: 1px solid $border-subtle;
       border-radius: $radius-card;
-      color: $text-primary;
-      padding: $space-2 $space-3;
-      height: 38px;
-      cursor: pointer;
-      
-      &:focus {
-        border-color: $border-focus;
-        outline: none;
-      }
-    }
-    
-    .analytics-grid {
-      display: flex;
-      flex-direction: column;
-      gap: $space-6;
-    }
-    
-    .chart-card {
-      background-color: $bg-surface;
-      border: 1px solid $border-subtle;
-      border-radius: $radius-card;
-      padding: $space-5;
-    }
-    
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      padding: $space-6;
       margin-bottom: $space-4;
     }
-    
-    .card-title {
+    .panel__title {
       font-family: $font-display;
-      font-size: $text-base;
-      color: $text-primary;
-      font-weight: $weight-semibold;
-    }
-    
-    .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba($border-subtle, 0.5);
-      border-radius: 50%;
-      border-top-color: $border-focus;
-      animation: spin 800ms linear infinite;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    .access-denied-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex: 1;
-      padding: $space-10;
-    }
-    
-    .error-banner {
-      max-width: 400px;
-      text-align: center;
-      padding: $space-8;
-      border: 1px solid rgba($urgency-now-accent, 0.2);
-      border-radius: $radius-card;
-      background-color: rgba($urgency-now-accent, 0.05);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    
-    .error-banner__icon {
-      font-size: 40px;
-      margin-bottom: $space-4;
-    }
-    
-    .error-banner__title {
-      font-family: $font-display;
-      font-size: $text-xl;
-      color: $urgency-now-accent;
-      margin-bottom: $space-2;
-      font-weight: $weight-semibold;
-    }
-    
-    .error-banner__text {
-      font-family: $font-body;
       font-size: $text-sm;
-      color: $text-secondary;
+      color: $text-muted;
+      letter-spacing: 1px;
+      margin-bottom: $space-4;
+    }
+    .analytics__privacy {
+      display: flex;
+      align-items: center;
+      gap: $space-2;
+      color: $text-muted;
+      font-size: $text-xs;
+      margin-top: $space-6;
+      padding-top: $space-4;
+      border-top: 1px solid $border-subtle;
+      mat-icon { font-size: 14px; }
     }
   `]
 })
@@ -199,26 +106,37 @@ export class TeamAnalyticsComponent implements OnInit, OnDestroy {
   daysFilter$ = this.store.select(selectDaysFilter);
   loading$ = this.store.select(selectAnalyticsLoading);
 
+  teamLoad: any = null;
+  recommendations: any[] = [];
+  daysFilter = '7';
+
   private sub = new Subscription();
 
   ngOnInit(): void {
     this.sub.add(
       combineLatest([this.user$, this.daysFilter$]).subscribe(([user, days]) => {
-        if (user && user.role === 'MANAGER') {
+        if (user) {
           this.store.dispatch(AnalyticsActions.loadAnalyticsDashboard({ managerId: user.id, days }));
         }
       })
     );
+
+    this.sub.add(this.teamLoad$.subscribe(data => this.teamLoad = data));
+    this.sub.add(this.recommendations$.subscribe(data => this.recommendations = data || []));
+    this.sub.add(this.daysFilter$.subscribe(days => this.daysFilter = String(days)));
   }
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
   }
 
-  onFilterChange(event: Event, managerId: string): void {
-    const value = (event.target as HTMLSelectElement).value;
-    const days = parseInt(value, 10);
+  onDaysChange(event: any): void {
+    const days = parseInt(event.value, 10);
     this.store.dispatch(AnalyticsActions.setDaysFilter({ days }));
-    this.store.dispatch(AnalyticsActions.loadAnalyticsDashboard({ managerId, days }));
+    this.user$.pipe(first()).subscribe(user => {
+      if (user) {
+        this.store.dispatch(AnalyticsActions.loadAnalyticsDashboard({ managerId: user.id, days }));
+      }
+    });
   }
 }

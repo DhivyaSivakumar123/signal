@@ -1,9 +1,12 @@
-import { Component, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs';
 import { User } from '../../../core/models/user.model';
+import { selectUser } from '../../../state/auth/auth.selectors';
 
 @Component({
-  selector: 'app-account-settings',
+  selector: 'app-account',
   standalone: true,
   imports: [CommonModule],
   template: `
@@ -39,11 +42,7 @@ import { User } from '../../../core/models/user.model';
     @import 'styles/tokens';
     
     .card {
-      background-color: $bg-surface;
-      border: 1px solid $border-subtle;
-      border-radius: $radius-card;
       padding: $space-5;
-      margin-bottom: $space-6;
     }
     
     .card-title {
@@ -104,6 +103,19 @@ import { User } from '../../../core/models/user.model';
     }
   `]
 })
-export class AccountComponent {
-  @Input() user: User | null = null;
+export class AccountComponent implements OnInit, OnDestroy {
+  private store = inject(Store);
+  private sub = new Subscription();
+
+  user: User | null = null;
+
+  ngOnInit(): void {
+    this.sub.add(
+      this.store.select(selectUser).subscribe(u => this.user = u)
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
+  }
 }

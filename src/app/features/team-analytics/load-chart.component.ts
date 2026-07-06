@@ -49,7 +49,7 @@ Chart.register(
   `]
 })
 export class LoadChartComponent implements OnChanges {
-  @Input() data: TeamLoad | null = null;
+  @Input() teamLoad: TeamLoad | null = null;
 
   chartType: ChartType = 'bar';
   chartData: ChartData<'bar'> = {
@@ -80,7 +80,7 @@ export class LoadChartComponent implements OnChanges {
   };
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data']) {
+    if (changes['teamLoad']) {
       this.updateChart();
     }
   }
@@ -91,8 +91,8 @@ export class LoadChartComponent implements OnChanges {
     const outlookData = Array(24).fill(0);
     const calendarData = Array(24).fill(0);
 
-    if (this.data && this.data.data) {
-      for (const bucket of this.data.data) {
+    if (this.teamLoad && this.teamLoad.data) {
+      for (const bucket of this.teamLoad.data) {
         const hour = bucket.hourBucket;
         if (hour >= 0 && hour < 24) {
           if (bucket.source === 'GMAIL') gmailData[hour] += bucket.count;

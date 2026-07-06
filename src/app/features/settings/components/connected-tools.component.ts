@@ -1,10 +1,11 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs';
 import { Integration, Provider } from '../../../core/models/integration.model';
-import { IntegrationService } from '../../../core/services/integration.service';
 import { IntegrationsActions } from '../../../state/integrations/integrations.actions';
 import { SourceIconComponent } from '../../../shared/components/source-icon/source-icon.component';
+import { selectIntegrations, selectIntegrationsLoading } from '../../../state/integrations/integrations.selectors';
 
 @Component({
   selector: 'app-connected-tools',
@@ -50,11 +51,7 @@ import { SourceIconComponent } from '../../../shared/components/source-icon/sour
     @import 'styles/tokens';
     
     .card {
-      background-color: $bg-surface;
-      border: 1px solid $border-subtle;
-      border-radius: $radius-card;
-      padding: $space-5;
-      margin-bottom: $space-6;
+      padding: $space-6;
     }
     
     .card-title {
@@ -158,12 +155,12 @@ import { SourceIconComponent } from '../../../shared/components/source-icon/sour
     }
   `]
 })
-export class ConnectedToolsComponent {
-  @Input() integrations: Integration[] = [];
-  @Input() loading = false;
+export class ConnectedToolsComponent implements OnInit, OnDestroy {
+  integrations: Integration[] = [];
+  loading = false;
 
   private store = inject(Store);
-  private integrationService = inject(IntegrationService);
+  private sub = new Subscription();
 
   tools = [
     { provider: 'SLACK' as Provider, label: 'Slack' },
@@ -171,6 +168,19 @@ export class ConnectedToolsComponent {
     { provider: 'OUTLOOK' as Provider, label: 'Outlook' },
     { provider: 'CALENDAR' as Provider, label: 'Calendar' }
   ];
+
+  ngOnInit(): void {
+    this.sub.add(
+      this.store.select(selectIntegrations).subscribe(data => this.integrations = data || [])
+    );
+    this.sub.add(
+      this.store.select(selectIntegrationsLoading).subscribe(loading => this.loading = loading)
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
+  }
 
   getActiveStatus(provider: Provider): string {
     const matched = this.integrations.find(i => i.provider === provider);

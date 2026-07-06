@@ -6,7 +6,7 @@ import { Subscription, combineLatest, map } from 'rxjs';
 import { selectUser } from '../../state/auth/auth.selectors';
 import { selectActiveIntegrations, selectIntegrations, selectIntegrationsLoading } from '../../state/integrations/integrations.selectors';
 import { IntegrationsActions } from '../../state/integrations/integrations.actions';
-  import { 
+import { 
   selectTriageItems, 
   selectTriageLoading, 
   selectSelectedSlot,
@@ -23,7 +23,11 @@ import { ToastService } from '../../shared/components/toast/toast.service';
 import { TriageSectionComponent } from './triage-section.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { SourceIconComponent } from '../../shared/components/source-icon/source-icon.component';
-import { TriageItem, UserPreference } from '../../core/models/triage.model';
+import { UrgencyBadgeComponent } from '../../shared/components/urgency-badge/urgency-badge.component';
+import { TriageItem, FocusSlot } from '../../core/models/triage.model';
+import { TruncatePipe } from '../../shared/pipes/truncate.pipe';
+import { MatIconModule } from '@angular/material/icon';
+import { TopbarComponent } from '../../layout/topbar/topbar.component';
 
 @Component({
   selector: 'app-triage',
@@ -33,380 +37,195 @@ import { TriageItem, UserPreference } from '../../core/models/triage.model';
     FormsModule,
     TriageSectionComponent,
     EmptyStateComponent,
-    SourceIconComponent
+    SourceIconComponent,
+    UrgencyBadgeComponent,
+    TruncatePipe,
+    MatIconModule
   ],
   template: `
-    <div class="triage-container">
-      <div class="triage-main">
-        <!-- Header -->
-        <header class="triage-header">
-          <div class="header-left">
-            <h1 class="welcome-title">Today, {{ (user$ | async)?.name || 'there' }}</h1>
-            <p class="summary-line">
-              {{ (nowCount$ | async) }} urgent · {{ (todayCount$ | async) }} today · {{ (weekCount$ | async) }} this week
-            </p>
-          </div>
-          <div class="header-right">
-            <div class="sync-indicator" (click)="onSyncClick()" style="cursor: pointer;" title="Click to sync integrations now">
-              <span class="spinner" *ngIf="(loading$ | async) || (syncing$ | async)"></span>
-              <span class="sync-text">{{ ((loading$ | async) || (syncing$ | async)) ? 'Syncing...' : 'Sync Now' }}</span>
-            </div>
-          </div>
-        </header>
+    <div class="triage">
 
-        <!-- Feed Content -->
-        <div class="feed-content">
-          <ng-container *ngIf="hasItems$ | async; else emptyFeed">
-            <!-- NOW Section -->
-            <app-triage-section 
-              title="Now" 
-              [items]="getFilteredItems('NOW', (items$ | async) || [])" 
-              [selectedSlot]="selectedSlot$ | async"
-              [hasHighlightsInFeed]="hasHighlightsInFeed"
-              [submittingItemIds]="(submittingItemIds$ | async) || []"
-              (feedback)="onFeedback($event)">
-            </app-triage-section>
-
-            <!-- TODAY Section -->
-            <app-triage-section 
-              title="Today" 
-              [items]="getFilteredItems('TODAY', (items$ | async) || [])" 
-              [selectedSlot]="selectedSlot$ | async"
-              [hasHighlightsInFeed]="hasHighlightsInFeed"
-              [submittingItemIds]="(submittingItemIds$ | async) || []"
-              (feedback)="onFeedback($event)">
-            </app-triage-section>
-
-            <!-- THIS WEEK Section -->
-            <app-triage-section 
-              title="This Week" 
-              [items]="getFilteredItems('THIS_WEEK', (items$ | async) || [])" 
-              [selectedSlot]="selectedSlot$ | async"
-              [hasHighlightsInFeed]="hasHighlightsInFeed"
-              [submittingItemIds]="(submittingItemIds$ | async) || []"
-              (feedback)="onFeedback($event)">
-            </app-triage-section>
-
-            <!-- FYI Section -->
-            <app-triage-section 
-              title="FYI" 
-              [items]="getFilteredItems('FYI', (items$ | async) || [])" 
-              [selectedSlot]="selectedSlot$ | async"
-              [hasHighlightsInFeed]="hasHighlightsInFeed"
-              [submittingItemIds]="(submittingItemIds$ | async) || []"
-              (feedback)="onFeedback($event)">
-            </app-triage-section>
-          </ng-container>
-
-          <ng-template #emptyFeed>
-            <app-empty-state 
-              headline="All quiet" 
-              subline="Your inbox is clear or syncing..." 
-              ctaLabel="Manage Connected Tools" 
-              ctaRoute="/app/settings">
-            </app-empty-state>
-          </ng-template>
+      <!-- Page header -->
+      <div class="triage__header">
+        <h1 class="triage__date">{{ today | date:'EEEE, dd MMMM yyyy' }}</h1>
+        <div class="triage__summary">
+          <span class="summary__chip summary__chip--now">{{ nowCount }} NOW</span>
+          <span class="summary__chip summary__chip--today">{{ todayCount }} TODAY</span>
+          <span class="summary__chip summary__chip--week">{{ weekCount }} THIS WEEK</span>
+          <span class="summary__chip summary__chip--fyi">{{ fyiCount }} FYI</span>
         </div>
       </div>
 
-      <aside class="triage-sidebar">
-        <!-- Preferences Card -->
-        <div class="prefs-card">
-          <h3 class="card-title">Focus Preferences</h3>
-          
-          <div class="form-group">
-            <label class="form-label">Stated Priorities</label>
-            <textarea class="form-textarea" 
-                      [(ngModel)]="statedPriorities" 
-                      placeholder="e.g. Focus on billing queries, skip marketing updates..."></textarea>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Digest Time</label>
-            <select class="form-select" [(ngModel)]="digestTime">
-              <option [ngValue]="null">Off</option>
-              <option value="09:00">9:00 AM</option>
-              <option value="12:00">12:00 PM</option>
-              <option value="15:00">3:00 PM</option>
-              <option value="18:00">6:00 PM</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Digest Channel</label>
-            <select class="form-select" [(ngModel)]="digestChannel">
-              <option value="NONE">None</option>
-              <option value="EMAIL">Email</option>
-              <option value="SLACK">Slack</option>
-            </select>
-          </div>
-
-          <button class="save-btn" (click)="savePreferences()">Save Preferences</button>
-          
-          <div class="divider"></div>
-          
-          <button class="digest-btn" (click)="sendDigestNow()">Send Digest Now</button>
+      <!-- Suggested strip (top 3 NOW items) — mirrors Drive's "Suggested files" -->
+      <div class="triage__suggested" *ngIf="suggestedItems.length > 0">
+        <div class="suggested__header">
+          <mat-icon>bolt</mat-icon>
+          <span>Needs you now</span>
         </div>
-
-        <!-- Sync Status Card -->
-        <div class="sync-card">
-          <h3 class="card-title">Sync Status</h3>
-          <div class="sync-list">
-            <div class="sync-item" *ngFor="let s of integrations$ | async">
-              <app-source-icon [provider]="s.provider"></app-source-icon>
-              <span class="sync-name">{{ s.provider | titlecase }}</span>
-              <span class="sync-status-badge sync-status-badge--{{ s.status.toLowerCase() }}">
-                {{ s.status }}
-              </span>
+        <div class="suggested__cards">
+          <div
+            class="suggested__card"
+            *ngFor="let item of suggestedItems"
+            (click)="scrollToItem(item.id)"
+          >
+            <app-source-icon [provider]="item.sources[0]" />
+            <div class="suggested__card-body">
+              <span class="suggested__sender">{{ item.senderName }}</span>
+              <span class="suggested__preview">{{ item.subjectOrPreview | truncate:60 }}</span>
             </div>
-            <div *ngIf="!(integrations$ | async)?.length" class="no-sync-text">
-              No tools connected.
-            </div>
+            <app-urgency-badge [urgency]="item.urgency" />
           </div>
         </div>
-      </aside>
+      </div>
+
+      <!-- Column headers — Drive-style -->
+      <div class="triage__col-header">
+        <span class="col-header__source">Source</span>
+        <span class="col-header__sender">From</span>
+        <span class="col-header__preview">Subject / Preview</span>
+        <span class="col-header__reason">Why flagged</span>
+        <span class="col-header__time">Time</span>
+        <span class="col-header__actions"></span>
+      </div>
+
+      <!-- Loading skeleton -->
+      <div class="triage__skeleton" *ngIf="loading">
+        <div class="skeleton__row" *ngFor="let i of [1,2,3,4,5]">
+          <div class="skeleton__cell skeleton__cell--sm"></div>
+          <div class="skeleton__cell skeleton__cell--md"></div>
+          <div class="skeleton__cell skeleton__cell--lg"></div>
+          <div class="skeleton__cell skeleton__cell--md"></div>
+          <div class="skeleton__cell skeleton__cell--sm"></div>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <app-empty-state
+        *ngIf="!loading && totalCount === 0"
+        headline="You're clear."
+        subline="Nothing needs your attention right now."
+      />
+
+      <!-- Urgency sections -->
+      <app-triage-section
+        *ngFor="let urgency of urgencyTiers"
+        [urgency]="urgency"
+        [items]="getItemsByUrgency(urgency)"
+        [selectedSlot]="selectedSlot"
+        (feedbackSubmitted)="onFeedback($event)"
+      />
+
     </div>
   `,
   styles: [`
     @import 'styles/tokens';
-    
-    .triage-container {
-      display: flex;
-      padding: $space-6;
-      gap: $space-6;
-      flex: 1;
-      min-height: 0;
-      overflow-y: auto;
-    }
-    
-    .triage-main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-    
-    .triage-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: $space-6;
-    }
-    
-    .welcome-title {
-      font-family: $font-display;
-      font-size: $text-xl;
-      color: $text-primary;
-      font-weight: $weight-semibold;
-      margin-bottom: $space-1;
-    }
-    
-    .summary-line {
-      font-family: $font-body;
-      font-size: $text-sm;
-      color: $text-secondary;
-    }
-    
-    .sync-indicator {
-      display: flex;
-      align-items: center;
-      gap: $space-2;
-      color: $text-muted;
-      font-family: $font-body;
-      font-size: $text-xs;
-      padding: $space-1 $space-2;
-      border-radius: $radius-badge;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      transition: all 0.2s ease;
 
-      &:hover {
-        background: rgba(255, 255, 255, 0.08);
-        color: $text-secondary;
-      }
-    }
-    
-    .spinner {
-      width: 12px;
-      height: 12px;
-      border: 2px solid rgba($border-subtle, 0.5);
-      border-radius: 50%;
-      border-top-color: $border-focus;
-      animation: spin 800ms linear infinite;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    .feed-content {
+    .triage { padding: 0; }
+
+    .triage__header {
       display: flex;
-      flex-direction: column;
-      flex: 1;
+      align-items: center;
+      justify-content: space-between;
+      padding: $space-4 $space-6;
+      border-bottom: 1px solid $border-subtle;
     }
-    
-    .triage-sidebar {
-      width: 300px;
-      display: flex;
-      flex-direction: column;
-      gap: $space-6;
-      flex-shrink: 0;
-    }
-    
-    .prefs-card, .sync-card {
-      background-color: $bg-surface;
-      border: 1px solid $border-subtle;
-      border-radius: $radius-card;
-      padding: $space-5;
-    }
-    
-    .card-title {
+
+    .triage__date {
       font-family: $font-display;
-      font-size: $text-base;
+      font-size: $text-lg;
       color: $text-primary;
-      font-weight: $weight-semibold;
-      margin-bottom: $space-4;
+      font-weight: $weight-medium;
+      margin: 0;
     }
-    
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: $space-1;
-      margin-bottom: $space-4;
-    }
-    
-    .form-label {
-      font-family: $font-body;
+
+    .triage__summary { display: flex; gap: $space-2; }
+    .summary__chip {
+      font-family: $font-display;
       font-size: $text-xs;
-      color: $text-secondary;
-      font-weight: $weight-medium;
+      font-weight: $weight-semibold;
+      padding: 3px 10px;
+      border-radius: 12px;
+      &--now   { background: rgba($urgency-now-accent, 0.15);   color: $urgency-now-accent; }
+      &--today { background: rgba($urgency-today-accent, 0.15); color: $urgency-today-accent; }
+      &--week  { background: rgba($urgency-week-accent, 0.15);  color: $urgency-week-accent; }
+      &--fyi   { background: rgba($urgency-fyi-accent, 0.15);   color: $urgency-fyi-accent; }
     }
-    
-    .form-textarea {
-      font-family: $font-body;
-      font-size: $text-sm;
-      background-color: $bg-base;
-      border: 1px solid $border-subtle;
-      border-radius: $radius-card;
-      color: $text-primary;
-      padding: $space-2 $space-3;
-      resize: vertical;
-      min-height: 80px;
-      
-      &:focus {
-        border-color: $border-focus;
-        outline: none;
-      }
+
+    // Suggested strip
+    .triage__suggested {
+      padding: $space-4 $space-6;
+      border-bottom: 1px solid $border-subtle;
     }
-    
-    .form-select {
-      font-family: $font-body;
-      font-size: $text-sm;
-      background-color: $bg-base;
-      border: 1px solid $border-subtle;
-      border-radius: $radius-card;
-      color: $text-primary;
-      padding: $space-2 $space-3;
-      height: 38px;
-      
-      &:focus {
-        border-color: $border-focus;
-        outline: none;
-      }
-    }
-    
-    .save-btn {
-      width: 100%;
-      height: 36px;
-      background-color: $border-focus;
-      color: $text-primary;
-      border-radius: $radius-badge;
-      font-family: $font-body;
-      font-size: $text-sm;
-      font-weight: $weight-medium;
-      border: none;
-      cursor: pointer;
-      transition: background-color 150ms ease;
-      
-      &:hover {
-        background-color: lighten($border-focus, 10%);
-      }
-    }
-    
-    .divider {
-      height: 1px;
-      background-color: $border-subtle;
-      margin: $space-4 0;
-    }
-    
-    .digest-btn {
-      width: 100%;
-      height: 36px;
-      background-color: transparent;
-      border: 1px solid $border-subtle;
-      color: $text-primary;
-      border-radius: $radius-badge;
-      font-family: $font-body;
-      font-size: $text-sm;
-      font-weight: $weight-medium;
-      cursor: pointer;
-      transition: background-color 150ms ease;
-      
-      &:hover {
-        background-color: $bg-elevated;
-      }
-    }
-    
-    .sync-list {
-      display: flex;
-      flex-direction: column;
-      gap: $space-3;
-    }
-    
-    .sync-item {
+    .suggested__header {
       display: flex;
       align-items: center;
       gap: $space-2;
-      font-family: $font-body;
-      font-size: $text-sm;
-      
-      .sync-name {
-        color: $text-primary;
-      }
-      
-      .sync-status-badge {
-        margin-left: auto;
-        font-family: $font-display;
-        font-size: $text-xs;
-        font-weight: $weight-semibold;
-        padding: 1px 6px;
-        border-radius: 4px;
-        text-transform: uppercase;
-        
-        &--active {
-          background-color: rgba(#34A853, 0.15);
-          color: #34A853;
-        }
-        
-        &--expired {
-          background-color: rgba($urgency-now-accent, 0.15);
-          color: $urgency-now-accent;
-        }
-        
-        &--revoked {
-          background-color: rgba($text-muted, 0.15);
-          color: $text-muted;
-        }
-      }
+      color: $text-muted;
+      font-size: $text-xs;
+      font-family: $font-display;
+      letter-spacing: 1px;
+      margin-bottom: $space-3;
+      mat-icon { font-size: 16px; color: $urgency-now-accent; }
     }
-    
-    .no-sync-text {
-      font-family: $font-body;
+    .suggested__cards { display: flex; gap: $space-3; flex-wrap: wrap; }
+    .suggested__card {
+      display: flex;
+      align-items: center;
+      gap: $space-3;
+      background: $bg-surface;
+      border: 1px solid $border-subtle;
+      border-radius: $radius-card;
+      padding: $space-3 $space-4;
+      cursor: pointer;
+      flex: 1;
+      min-width: 220px;
+      max-width: 340px;
+      transition: background 180ms ease;
+      &:hover { background: $bg-elevated; }
+    }
+    .suggested__card-body { flex: 1; overflow: hidden; }
+    .suggested__sender  { display: block; font-size: $text-sm; color: $text-primary; font-weight: $weight-medium; }
+    .suggested__preview { display: block; font-size: $text-xs; color: $text-muted; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    // Column headers
+    .triage__col-header {
+      display: grid;
+      grid-template-columns: 48px 160px 1fr 200px 100px 80px;
+      padding: $space-2 $space-6;
+      border-bottom: 1px solid $border-subtle;
+      background: $bg-base;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .triage__col-header span {
+      font-family: $font-display;
       font-size: $text-xs;
       color: $text-muted;
-      text-align: center;
-      padding: $space-2 0;
+      letter-spacing: 0.5px;
     }
+
+    // Skeleton
+    .triage__skeleton { padding: 0 $space-6; }
+    .skeleton__row {
+      display: grid;
+      grid-template-columns: 48px 160px 1fr 200px 100px;
+      gap: $space-3;
+      padding: $space-3 0;
+      border-bottom: 1px solid $border-subtle;
+      align-items: center;
+    }
+    .skeleton__cell {
+      height: 14px;
+      border-radius: $radius-badge;
+      background: linear-gradient(90deg, $bg-surface 25%, $bg-elevated 50%, $bg-surface 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      &--sm { width: 48px; }
+      &--md { width: 120px; }
+      &--lg { width: 100%; }
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
   `]
 })
 export class TriageComponent implements OnInit, OnDestroy {
@@ -428,15 +247,26 @@ export class TriageComponent implements OnInit, OnDestroy {
   hasItems$ = this.items$.pipe(map(items => items.length > 0));
   submittingItemIds$ = this.store.select(selectSubmittingFeedback);
 
-  // Pref form bindings
-  statedPriorities = '';
-  digestTime: string | null = null;
-  digestChannel: 'EMAIL' | 'SLACK' | 'NONE' = 'NONE';
-
-  hasHighlightsInFeed = false;
+  today = new Date();
+  nowCount = 0;
+  todayCount = 0;
+  weekCount = 0;
+  fyiCount = 0;
+  loading = false;
+  selectedSlot: FocusSlot | null = null;
+  allTriageItems: TriageItem[] = [];
+  urgencyTiers: ('NOW' | 'TODAY' | 'THIS_WEEK' | 'FYI')[] = ['NOW', 'TODAY', 'THIS_WEEK', 'FYI'];
 
   private sub = new Subscription();
   private lastSelectedSlot: any = null;
+
+  get suggestedItems(): TriageItem[] {
+    return this.allTriageItems.filter(i => i.urgency === 'NOW').slice(0, 3);
+  }
+
+  get totalCount(): number {
+    return this.allTriageItems.length;
+  }
 
   ngOnInit(): void {
     // Initial loads
@@ -448,16 +278,13 @@ export class TriageComponent implements OnInit, OnDestroy {
     // Start background sync polling
     this.store.dispatch(TriageActions.startPolling());
 
-    // Sync preferences form
-    this.sub.add(
-      this.store.select(selectPreferences).subscribe((prefs) => {
-        if (prefs) {
-          this.statedPriorities = prefs.statedPriorities;
-          this.digestTime = prefs.digestTime;
-          this.digestChannel = prefs.digestChannel;
-        }
-      })
-    );
+    this.sub.add(this.nowCount$.subscribe(c => this.nowCount = c));
+    this.sub.add(this.todayCount$.subscribe(c => this.todayCount = c));
+    this.sub.add(this.weekCount$.subscribe(c => this.weekCount = c));
+    this.sub.add(this.fyiCount$.subscribe(c => this.fyiCount = c));
+    this.sub.add(this.loading$.subscribe(l => this.loading = l));
+    this.sub.add(this.selectedSlot$.subscribe(s => this.selectedSlot = s));
+    this.sub.add(this.items$.subscribe(items => this.allTriageItems = items));
 
     // Watch focus slot selection for toast warning
     this.sub.add(
@@ -469,7 +296,6 @@ export class TriageComponent implements OnInit, OnDestroy {
             const itemTime = new Date(item.receivedAt).getTime();
             return itemTime >= start && itemTime <= end;
           });
-          this.hasHighlightsInFeed = hasHighlights;
 
           // Only trigger toast when slot actually changes, to avoid redundant warnings during polling
           if (slot !== this.lastSelectedSlot) {
@@ -479,7 +305,6 @@ export class TriageComponent implements OnInit, OnDestroy {
             }
           }
         } else {
-          this.hasHighlightsInFeed = false;
           this.lastSelectedSlot = null;
         }
       })
@@ -492,35 +317,24 @@ export class TriageComponent implements OnInit, OnDestroy {
     this.sub.unsubscribe();
   }
 
-  getFilteredItems(urgency: 'NOW' | 'TODAY' | 'THIS_WEEK' | 'FYI', items: TriageItem[]): TriageItem[] {
-    return items.filter(i => i.urgency === urgency);
+  getItemsByUrgency(urgency: 'NOW' | 'TODAY' | 'THIS_WEEK' | 'FYI'): TriageItem[] {
+    const query = (TopbarComponent.searchQuery || '').toLowerCase().trim();
+    const filtered = this.allTriageItems.filter(i => i.urgency === urgency);
+    if (!query) {
+      return filtered;
+    }
+    return filtered.filter(item => 
+      (item.senderName || '').toLowerCase().includes(query) ||
+      (item.subjectOrPreview || '').toLowerCase().includes(query) ||
+      (item.reasonSnippet || '').toLowerCase().includes(query)
+    );
   }
 
   onFeedback(event: { id: string; wasUrgent: boolean }): void {
     this.store.dispatch(TriageActions.submitFeedback({ id: event.id, wasUrgent: event.wasUrgent }));
   }
 
-  savePreferences(): void {
-    const prefs: UserPreference = {
-      statedPriorities: this.statedPriorities,
-      digestTime: this.digestTime,
-      digestChannel: this.digestChannel
-    };
-    this.store.dispatch(TriageActions.updatePreferences({ prefs }));
-  }
-
-  sendDigestNow(): void {
-    this.triageService.sendDigestNow().subscribe({
-      next: () => {
-        this.toastService.success('Digest sent!');
-      },
-      error: () => {
-        this.toastService.error('Failed to send digest.');
-      }
-    });
-  }
-
-  onSyncClick(): void {
-    this.store.dispatch(IntegrationsActions.syncIntegrations());
+  scrollToItem(id: string): void {
+    document.getElementById('item-' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }

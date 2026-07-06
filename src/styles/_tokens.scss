@@ -52,3 +52,29 @@ $space-5: 20px; $space-6: 24px;  $space-8: 32px;  $space-10: 40px;
 // ─── Shape ───
 $radius-card:  6px;
 $radius-badge: 4px;
+
+// ─── Layout ───
+$sidebar-width:       240px;
+$sidebar-collapsed:   64px;
+$topbar-height:       64px;
+
+// ─── List row ───
+$row-height:          48px;
+$row-hover-bg:        #1F2435;
+$row-selected-bg:     #1A2440;
+$row-border:          1px solid #252A38;
+
+// ─── Sidebar ───
+$sidebar-bg:          #13161F;
+$sidebar-item-active: #1F2A45;
+$sidebar-item-hover:  #1A1F2E;
+
+// ─── Topbar ───
+$topbar-bg:           #0F1117;
+$topbar-border:       1px solid #252A38;
+
+// ─── Search ───
+$search-bg:           #181C26;
+$search-focus-bg:     #1F2435;
+$search-border:       1px solid #252A38;
+$search-focus-border: 1px solid #4A90D9;

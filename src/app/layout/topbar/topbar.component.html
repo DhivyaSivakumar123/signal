@@ -1,0 +1,42 @@
+<header class="topbar">
+  <!-- Left: hamburger + wordmark -->
+  <div class="topbar__left">
+    <button class="topbar__menu-btn" (click)="toggleSidebar()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span class="topbar__wordmark">SIGNAL</span>
+  </div>
+
+  <!-- Center: search bar -->
+  <div class="topbar__search">
+    <mat-icon class="topbar__search-icon">search</mat-icon>
+    <input
+      class="topbar__search-input"
+      type="text"
+      placeholder="Search Signal..."
+      [(ngModel)]="searchQuery"
+      (input)="onSearch($event)"
+    />
+    <mat-icon class="topbar__search-clear" *ngIf="searchQuery" (click)="clearSearch()">close</mat-icon>
+  </div>
+
+  <!-- Right: notification bell + avatar -->
+  <div class="topbar__right">
+    <button class="topbar__icon-btn" matTooltip="Send digest now" (click)="sendDigest()">
+      <mat-icon>notifications_none</mat-icon>
+    </button>
+    <div class="topbar__avatar" [matTooltip]="user?.email ?? ''" (click)="openUserMenu()">
+      {{ userInitials }}
+    </div>
+    <!-- User dropdown menu -->
+    <div class="topbar__user-menu" *ngIf="userMenuOpen">
+      <div class="user-menu__header">
+        <span class="user-menu__name">{{ user?.name }}</span>
+        <span class="user-menu__email">{{ user?.email }}</span>
+      </div>
+      <div class="user-menu__divider"></div>
+      <button class="user-menu__item" routerLink="/app/settings">Settings</button>
+      <button class="user-menu__item user-menu__item--danger" (click)="logout()">Sign out</button>
+    </div>
+  </div>
+</header>

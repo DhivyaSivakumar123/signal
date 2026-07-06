@@ -1,12 +1,14 @@
-import { Component, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs';
 import { UserPreference } from '../../../core/models/triage.model';
 import { TriageActions } from '../../../state/triage/triage.actions';
+import { selectPreferences, selectTriageLoading } from '../../../state/triage/triage.selectors';
 
 @Component({
-  selector: 'app-focus-preferences-settings',
+  selector: 'app-focus-preferences',
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
@@ -23,38 +25,32 @@ import { TriageActions } from '../../../state/triage/triage.actions';
 
       <div class="form-row">
         <div class="form-group flex-1">
-          <label class="form-label">Digest Delivery Time</label>
-          <select class="form-select" [(ngModel)]="digestTime">
-            <option [ngValue]="null">Off</option>
-            <option value="09:00">9:00 AM</option>
-            <option value="12:00">12:00 PM</option>
-            <option value="15:00">3:00 PM</option>
-            <option value="18:00">6:00 PM</option>
-          </select>
+          <label class="form-label">Daily Digest Time</label>
+          <input type="time" class="form-input" [(ngModel)]="digestTime">
         </div>
-
+        
         <div class="form-group flex-1">
           <label class="form-label">Digest Channel</label>
           <select class="form-select" [(ngModel)]="digestChannel">
-            <option value="NONE">None</option>
+            <option value="NONE">Disabled</option>
             <option value="EMAIL">Email</option>
             <option value="SLACK">Slack</option>
           </select>
         </div>
       </div>
 
-      <button class="save-btn" [disabled]="saving" (click)="save()">{{ saving ? 'Saving...' : 'Save Changes' }}</button>
+      <div class="form-actions">
+        <button class="save-btn" [disabled]="saving" (click)="save()">
+          {{ saving ? 'Saving...' : 'Save Preferences' }}
+        </button>
+      </div>
     </div>
   `,
   styles: [`
     @import 'styles/tokens';
     
     .card {
-      background-color: $bg-surface;
-      border: 1px solid $border-subtle;
-      border-radius: $radius-card;
-      padding: $space-5;
-      margin-bottom: $space-6;
+      padding: $space-6;
     }
     
     .card-title {
@@ -75,67 +71,66 @@ import { TriageActions } from '../../../state/triage/triage.actions';
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: $space-1;
+      gap: $space-2;
       margin-bottom: $space-4;
+      
+      &.flex-1 {
+        flex: 1;
+      }
     }
-    
-    .flex-1 { flex: 1; }
     
     .form-row {
       display: flex;
       gap: $space-4;
+      margin-bottom: $space-5;
     }
     
     .form-label {
       font-family: $font-body;
       font-size: $text-xs;
+      font-weight: $weight-semibold;
       color: $text-secondary;
-      font-weight: $weight-medium;
+    }
+    
+    .form-input, .form-select, .form-textarea {
+      font-family: $font-body;
+      font-size: $text-sm;
+      background-color: $bg-elevated;
+      border: 1px solid $border-subtle;
+      border-radius: $radius-badge;
+      color: $text-primary;
+      padding: $space-2 $space-3;
+      outline: none;
+      transition: border-color 150ms ease;
+      
+      &:focus {
+        border-color: $border-focus;
+      }
     }
     
     .form-textarea {
-      font-family: $font-body;
-      font-size: $text-sm;
-      background-color: $bg-base;
-      border: 1px solid $border-subtle;
-      border-radius: $radius-card;
-      color: $text-primary;
-      padding: $space-2 $space-3;
-      resize: vertical;
       min-height: 100px;
-      
-      &:focus {
-        border-color: $border-focus;
-        outline: none;
-      }
+      resize: vertical;
     }
     
-    .form-select {
-      font-family: $font-body;
-      font-size: $text-sm;
-      background-color: $bg-base;
-      border: 1px solid $border-subtle;
-      border-radius: $radius-card;
-      color: $text-primary;
-      padding: $space-2 $space-3;
+    .form-input, .form-select {
       height: 38px;
-      
-      &:focus {
-        border-color: $border-focus;
-        outline: none;
-      }
+    }
+    
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
     }
     
     .save-btn {
-      width: 120px;
-      height: 36px;
       background-color: $border-focus;
       color: $text-primary;
+      border: none;
       border-radius: $radius-badge;
+      padding: $space-2 $space-4;
       font-family: $font-body;
       font-size: $text-sm;
       font-weight: $weight-medium;
-      border: none;
       cursor: pointer;
       transition: background-color 150ms ease;
       
@@ -145,22 +140,32 @@ import { TriageActions } from '../../../state/triage/triage.actions';
     }
   `]
 })
-export class FocusPreferencesComponent implements OnChanges {
-  @Input() preferences: UserPreference | null = null;
-  @Input() saving = false;
-
+export class FocusPreferencesComponent implements OnInit, OnDestroy {
   private store = inject(Store);
+  private sub = new Subscription();
 
   statedPriorities = '';
   digestTime: string | null = null;
   digestChannel: 'EMAIL' | 'SLACK' | 'NONE' = 'NONE';
+  saving = false;
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['preferences'] && this.preferences) {
-      this.statedPriorities = this.preferences.statedPriorities;
-      this.digestTime = this.preferences.digestTime;
-      this.digestChannel = this.preferences.digestChannel;
-    }
+  ngOnInit(): void {
+    this.sub.add(
+      this.store.select(selectPreferences).subscribe((prefs) => {
+        if (prefs) {
+          this.statedPriorities = prefs.statedPriorities;
+          this.digestTime = prefs.digestTime;
+          this.digestChannel = prefs.digestChannel;
+        }
+      })
+    );
+    this.sub.add(
+      this.store.select(selectTriageLoading).subscribe((s) => this.saving = s)
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
   save(): void {
