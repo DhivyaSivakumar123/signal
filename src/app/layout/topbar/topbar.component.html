@@ -15,8 +15,8 @@
       <mat-icon>notifications_none</mat-icon>
     </button>
     <div class="topbar__avatar" [matTooltip]="user?.email ?? ''" (click)="openUserMenu()">
-      <img *ngIf="user?.pictureUrl" [src]="user.pictureUrl" class="topbar__avatar-img" [alt]="user?.name" />
-      <span *ngIf="!user?.pictureUrl" class="topbar__avatar-initials">{{ userInitials }}</span>
+      <img *ngIf="resolvedAvatarUrl" [src]="resolvedAvatarUrl" class="topbar__avatar-img" [alt]="user?.name" />
+      <span *ngIf="!resolvedAvatarUrl" class="topbar__avatar-initials">{{ userInitials }}</span>
       <span class="topbar__avatar-badge topbar__avatar-badge--{{ user?.oauthProvider?.toLowerCase() }}"
             *ngIf="user?.oauthProvider === 'GOOGLE' || user?.oauthProvider === 'MICROSOFT'">
         {{ user?.oauthProvider === 'GOOGLE' ? 'G' : 'M' }}
@@ -26,8 +26,8 @@
     <div class="topbar__user-menu" *ngIf="userMenuOpen">
       <div class="user-menu__header">
         <div class="user-menu__avatar-wrap">
-          <img *ngIf="user?.pictureUrl" [src]="user.pictureUrl" class="user-menu__avatar-img" [alt]="user?.name" />
-          <div *ngIf="!user?.pictureUrl" class="user-menu__avatar-initials">{{ userInitials }}</div>
+          <img *ngIf="resolvedAvatarUrl" [src]="resolvedAvatarUrl" class="user-menu__avatar-img" [alt]="user?.name" />
+          <div *ngIf="!resolvedAvatarUrl" class="user-menu__avatar-initials">{{ userInitials }}</div>
           <span class="user-menu__avatar-badge user-menu__avatar-badge--{{ user?.oauthProvider?.toLowerCase() }}"
                 *ngIf="user?.oauthProvider === 'GOOGLE' || user?.oauthProvider === 'MICROSOFT'">
             {{ user?.oauthProvider === 'GOOGLE' ? 'G' : 'M' }}

@@ -37,7 +37,31 @@ export class TopbarComponent {
   userMenuOpen = false;
 
   constructor() {
-    this.user$.subscribe(u => this.user = u);
+    this.user$.subscribe(u => {
+      this.user = u;
+      if (u?.email && !u?.pictureUrl) {
+        this.computeGravatarUrl(u.email);
+      } else {
+        this.resolvedAvatarUrl = u?.pictureUrl || null;
+      }
+    });
+  }
+
+  resolvedAvatarUrl: string | null = null;
+
+  private async computeGravatarUrl(email: string): Promise<void> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(email.trim().toLowerCase());
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    // Gravatar with ?d=404 — if no gravatar exists, we fall back to initials
+    const gravatarUrl = `https://www.gravatar.com/avatar/${hashHex}?s=96&d=404`;
+    // Test if Gravatar returns a real image
+    const img = new Image();
+    img.onload = () => { this.resolvedAvatarUrl = gravatarUrl; };
+    img.onerror = () => { this.resolvedAvatarUrl = null; };
+    img.src = gravatarUrl;
   }
 
   get searchQuery(): string {
