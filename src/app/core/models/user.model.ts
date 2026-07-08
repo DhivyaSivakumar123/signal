@@ -5,6 +5,7 @@ export interface User {
   orgId: string;
   role: 'MANAGER' | 'IC';
   oauthProvider: 'GOOGLE' | 'MICROSOFT';
+  pictureUrl?: string;
 }
 
 export interface AuthTokens {

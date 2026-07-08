@@ -15,11 +15,24 @@
       <mat-icon>notifications_none</mat-icon>
     </button>
     <div class="topbar__avatar" [matTooltip]="user?.email ?? ''" (click)="openUserMenu()">
-      {{ userInitials }}
+      <img *ngIf="user?.pictureUrl" [src]="user.pictureUrl" class="topbar__avatar-img" [alt]="user?.name" />
+      <span *ngIf="!user?.pictureUrl" class="topbar__avatar-initials">{{ userInitials }}</span>
+      <span class="topbar__avatar-badge topbar__avatar-badge--{{ user?.oauthProvider?.toLowerCase() }}"
+            *ngIf="user?.oauthProvider === 'GOOGLE' || user?.oauthProvider === 'MICROSOFT'">
+        {{ user?.oauthProvider === 'GOOGLE' ? 'G' : 'M' }}
+      </span>
     </div>
     <!-- User dropdown menu -->
     <div class="topbar__user-menu" *ngIf="userMenuOpen">
       <div class="user-menu__header">
+        <div class="user-menu__avatar-wrap">
+          <img *ngIf="user?.pictureUrl" [src]="user.pictureUrl" class="user-menu__avatar-img" [alt]="user?.name" />
+          <div *ngIf="!user?.pictureUrl" class="user-menu__avatar-initials">{{ userInitials }}</div>
+          <span class="user-menu__avatar-badge user-menu__avatar-badge--{{ user?.oauthProvider?.toLowerCase() }}"
+                *ngIf="user?.oauthProvider === 'GOOGLE' || user?.oauthProvider === 'MICROSOFT'">
+            {{ user?.oauthProvider === 'GOOGLE' ? 'G' : 'M' }}
+          </span>
+        </div>
         <span class="user-menu__name">{{ user?.name }}</span>
         <span class="user-menu__email">{{ user?.email }}</span>
       </div>

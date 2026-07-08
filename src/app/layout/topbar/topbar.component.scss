@@ -105,6 +105,41 @@
   justify-content: center;
   cursor: pointer;
   user-select: none;
+  position: relative;
+  overflow: visible;
+  transition: box-shadow 180ms ease;
+  &:hover { box-shadow: 0 0 0 2px rgba(255,255,255,0.2); }
+}
+
+.topbar__avatar-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.topbar__avatar-initials {
+  line-height: 1;
+}
+
+.topbar__avatar-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  font-size: 8px;
+  font-weight: 700;
+  font-family: $font-display;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid $topbar-bg;
+  line-height: 1;
+  &--google { background: #4285f4; color: #fff; }
+  &--microsoft { background: #00a4ef; color: #fff; }
 }
 
 .topbar__user-menu {
@@ -118,7 +153,56 @@
   z-index: 200;
   overflow: hidden;
 }
-.user-menu__header { padding: $space-4; }
+.user-menu__header { padding: $space-4; display: flex; flex-direction: column; align-items: flex-start; }
+
+.user-menu__avatar-wrap {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  margin-bottom: $space-3;
+}
+
+.user-menu__avatar-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.user-menu__avatar-initials {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: $urgency-week-accent;
+  color: $text-primary;
+  font-family: $font-display;
+  font-size: $text-base;
+  font-weight: $weight-semibold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-menu__avatar-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: $font-display;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid $bg-surface;
+  line-height: 1;
+  &--google { background: #4285f4; color: #fff; }
+  &--microsoft { background: #00a4ef; color: #fff; }
+}
+
 .user-menu__name { display: block; color: $text-primary; font-size: $text-sm; font-weight: $weight-semibold; }
 .user-menu__email { display: block; color: $text-muted; font-size: $text-xs; margin-top: 2px; }
 .user-menu__divider { height: 1px; background: $border-subtle; }
