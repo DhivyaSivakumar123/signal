@@ -1,14 +1,14 @@
 <header class="topbar">
   <!-- Left: hamburger + wordmark -->
   <div class="topbar__left">
-    <button class="topbar__menu-btn" (click)="toggleSidebar()">
+    <button class="topbar__menu-btn" *ngIf="!isTriagePage()" (click)="toggleSidebar()">
       <mat-icon>menu</mat-icon>
     </button>
     <span class="topbar__wordmark">SIGNAL</span>
   </div>
 
   <!-- Center: search bar -->
-  <div class="topbar__search">
+  <div class="topbar__search" *ngIf="!isTriagePage()">
     <mat-icon class="topbar__search-icon">search</mat-icon>
     <input
       class="topbar__search-input"

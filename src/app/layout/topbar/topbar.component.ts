@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Store } from '@ngrx/store';
@@ -28,6 +28,7 @@ export class TopbarComponent {
   private store = inject(Store);
   private triageService = inject(TriageService);
   private toast = inject(ToastService);
+  private router = inject(Router);
 
   user$ = this.store.select(selectUser);
   user: any = null;
@@ -78,5 +79,9 @@ export class TopbarComponent {
 
   clearSearch() {
     this.searchQuery = '';
+  }
+
+  isTriagePage(): boolean {
+    return this.router.url.includes('/triage');
   }
 }

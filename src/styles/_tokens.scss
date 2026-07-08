@@ -16,9 +16,9 @@ $weight-medium:   500;
 $weight-semibold: 600;
 
 // ─── Backgrounds ───
-$bg-base:     #131314;   // app background (charcoal grey)
-$bg-surface:  #1e1f20;   // card/panel (Drive inner container)
-$bg-elevated: #2c2d30;   // hover, dropdowns
+$bg-base:     #1e1f20;   // app background (grey)
+$bg-surface:  #131314;   // card/panel (black)
+$bg-elevated: #202124;   // hover, dropdowns
 
 // ─── Urgency tinting (SIGNATURE ELEMENT — applied to entire card background) ───
 $urgency-now-bg:       #2A1A1A;
@@ -65,16 +65,16 @@ $row-selected-bg:     rgba(138, 180, 248, 0.08);
 $row-border:          1px solid rgba(255, 255, 255, 0.08);
 
 // ─── Sidebar ───
-$sidebar-bg:          #131314;
+$sidebar-bg:          #1e1f20;
 $sidebar-item-active: rgba(138, 180, 248, 0.12);
 $sidebar-item-hover:  rgba(255, 255, 255, 0.04);
 
 // ─── Topbar ───
-$topbar-bg:           #131314;
+$topbar-bg:           #1e1f20;
 $topbar-border:       none;
 
 // ─── Search ───
-$search-bg:           #2c2d30;
-$search-focus-bg:     #2c2d30;
+$search-bg:           #131314;
+$search-focus-bg:     #131314;
 $search-border:       none;
 $search-focus-border: 1px solid rgba(255, 255, 255, 0.1);
