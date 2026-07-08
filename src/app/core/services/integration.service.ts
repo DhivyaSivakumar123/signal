@@ -16,18 +16,20 @@ export class IntegrationService {
   }
 
   // These perform standard API POST requests to connect integrations
-  connectSlack(): Observable<Integration> {
-    return this.http.post<ApiResponse<Integration>>(`${environment.apiUrl}/api/integrations/slack/connect`, {})
-      .pipe(map(r => r.data));
+  connectSlack(): Observable<never> {
+    const token = localStorage.getItem('signal_access_token');
+    window.location.href = `${environment.apiUrl}/api/integrations/oauth2/authorize/slack?token=${token}&scope=slack`;
+    return new Observable<never>();
   }
   connectGmail(): Observable<never> {
     const token = localStorage.getItem('signal_access_token');
     window.location.href = `${environment.apiUrl}/api/integrations/oauth2/authorize/google?token=${token}&scope=gmail`;
     return new Observable<never>(); // Using standard RxJS Observable
   }
-  connectOutlook(): Observable<Integration> {
-    return this.http.post<ApiResponse<Integration>>(`${environment.apiUrl}/api/integrations/outlook/connect`, {})
-      .pipe(map(r => r.data));
+  connectOutlook(): Observable<never> {
+    const token = localStorage.getItem('signal_access_token');
+    window.location.href = `${environment.apiUrl}/api/integrations/oauth2/authorize/microsoft?token=${token}&scope=outlook`;
+    return new Observable<never>();
   }
   connectCalendar(): Observable<never> {
     const token = localStorage.getItem('signal_access_token');

@@ -66,13 +66,13 @@ export class IntegrationsEffects {
           case 'CALENDAR': connectObs = this.integrationService.connectCalendar(); break;
           default: throw new Error(`Unknown provider: ${provider}`);
         }
-        return connectObs.pipe(
-          tap((integration) => this.toastService.success(`Connected ${integration.provider}`)),
-          map((integration) => IntegrationsActions.connectIntegrationSuccess({ integration })),
+        return (connectObs as any).pipe(
+          tap((integration: any) => this.toastService.success(`Connected ${integration?.provider}`)),
+          map((integration: any) => IntegrationsActions.connectIntegrationSuccess({ integration })),
           catchError((error) => of(IntegrationsActions.connectIntegrationFailure({ error: error.message })))
         );
       })
-    )
+    ) as any
   );
 
   connectIntegrationSuccess$ = createEffect(() =>
