@@ -45,7 +45,7 @@ interface PeakSlot {
         <div class="analytics__title-group">
           <h1 class="analytics__title">Team Load</h1>
           <span class="analytics__subtitle" *ngIf="teamLoad">
-            {{ teamLoad.fromDate | date:'MMM d' }} to {{ teamLoad.toDate | date:'MMM d, yyyy' }}
+            {{ dateRangeLabel }}
           </span>
         </div>
         <mat-button-toggle-group [(value)]="daysFilter" (change)="onDaysChange($event)" class="toggle-group">
@@ -377,6 +377,14 @@ export class TeamAnalyticsComponent implements OnInit, OnDestroy {
   recommendations: any[] = [];
   daysFilter = '7';
   loading = false;
+
+  get dateRangeLabel(): string {
+    const to = new Date();
+    const from = new Date();
+    from.setDate(from.getDate() - parseInt(this.daysFilter, 10));
+    const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return `${fmt(from)} - ${fmt(to)}`;
+  }
 
   // Computed stats
   totalMessages = 0;
