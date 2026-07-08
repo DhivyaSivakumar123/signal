@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { TriageItem } from '../../../core/models/triage.model';
 import { SourceIconComponent } from '../source-icon/source-icon.component';
 import { UrgencyBadgeComponent } from '../urgency-badge/urgency-badge.component';
@@ -13,6 +14,7 @@ import { TruncatePipe } from '../../pipes/truncate.pipe';
   imports: [
     CommonModule,
     MatButtonModule,
+    MatIconModule,
     SourceIconComponent,
     UrgencyBadgeComponent,
     RelativeTimePipe,
@@ -42,8 +44,12 @@ import { TruncatePipe } from '../../pipes/truncate.pipe';
           <span class="action-spinner"></span>
         </ng-container>
         <ng-template #feedbackButtons>
-          <button mat-icon-button (click)="onFeedback(true)" title="This was urgent" class="action-btn">👍</button>
-          <button mat-icon-button (click)="onFeedback(false)" title="Not urgent" class="action-btn">👎</button>
+          <button mat-icon-button (click)="onFeedback(true)" title="This was urgent" class="action-btn">
+            <mat-icon>thumb_up</mat-icon>
+          </button>
+          <button mat-icon-button (click)="onFeedback(false)" title="Not urgent" class="action-btn">
+            <mat-icon>thumb_down</mat-icon>
+          </button>
         </ng-template>
       </div>
     </div>
