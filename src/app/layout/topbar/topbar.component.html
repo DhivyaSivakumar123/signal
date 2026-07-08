@@ -7,18 +7,7 @@
     <span class="topbar__wordmark">SIGNAL</span>
   </div>
 
-  <!-- Center: search bar -->
-  <div class="topbar__search" *ngIf="!isTriagePage()">
-    <mat-icon class="topbar__search-icon">search</mat-icon>
-    <input
-      class="topbar__search-input"
-      type="text"
-      placeholder="Search Signal..."
-      [(ngModel)]="searchQuery"
-      (input)="onSearch($event)"
-    />
-    <mat-icon class="topbar__search-clear" *ngIf="searchQuery" (click)="clearSearch()">close</mat-icon>
-  </div>
+  <!-- Center: empty space where search bar was -->
 
   <!-- Right: notification bell + avatar -->
   <div class="topbar__right">
