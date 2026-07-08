@@ -380,9 +380,9 @@ export class TeamAnalyticsComponent implements OnInit, OnDestroy {
 
   // Computed stats
   totalMessages = 0;
-  peakHourLabel = 'â€“';
-  busiestSource = 'â€“';
-  focusWindow = 'â€“';
+  peakHourLabel = '-';
+  busiestSource = '-';
+  focusWindow = '-';
   sourceStat: SourceStat[] = [];
   peakSlots: PeakSlot[] = [];
   maxHourCount = 0;
@@ -426,9 +426,9 @@ export class TeamAnalyticsComponent implements OnInit, OnDestroy {
   private computeStats(load: TeamLoad | null): void {
     if (!load || !load.data || load.data.length === 0) {
       this.totalMessages = 0;
-      this.peakHourLabel = 'â€“';
-      this.busiestSource = 'â€“';
-      this.focusWindow = 'â€“';
+      this.peakHourLabel = '-';
+      this.busiestSource = '-';
+      this.focusWindow = '-';
       this.sourceStat = [];
       this.peakSlots = [];
       this.maxHourCount = 0;
@@ -438,7 +438,7 @@ export class TeamAnalyticsComponent implements OnInit, OnDestroy {
     const buckets = load.data;
     this.totalMessages = buckets.reduce((s, b) => s + b.count, 0);
 
-    // Per-hour totals (0â€“23)
+    // Per-hour totals (0-23)
     const hourlyTotals = Array(24).fill(0);
     for (const b of buckets) {
       if (b.hourBucket >= 0 && b.hourBucket < 24) hourlyTotals[b.hourBucket] += b.count;
@@ -449,7 +449,7 @@ export class TeamAnalyticsComponent implements OnInit, OnDestroy {
     this.maxHourCount = maxCount;
     const peakHour = hourlyTotals.indexOf(maxCount);
     const nextHour = (peakHour + 1) % 24;
-    this.peakHourLabel = `${String(peakHour).padStart(2,'0')}:00â€“${String(nextHour).padStart(2,'0')}:00`;
+    this.peakHourLabel = `${String(peakHour).padStart(2,'0')}:00-${String(nextHour).padStart(2,'0')}:00`;
 
     // Quietest 3-hour block
     let minBlockSum = Infinity;
@@ -459,7 +459,7 @@ export class TeamAnalyticsComponent implements OnInit, OnDestroy {
       if (sum < minBlockSum) { minBlockSum = sum; minBlockStart = h; }
     }
     const blockEnd = (minBlockStart + 3) % 24;
-    this.focusWindow = `${String(minBlockStart).padStart(2,'0')}:00â€“${String(blockEnd).padStart(2,'0')}:00`;
+    this.focusWindow = `${String(minBlockStart).padStart(2,'0')}:00-${String(blockEnd).padStart(2,'0')}:00`;
 
     // Per-source totals
     const sourceTotals: Record<string, number> = {};
@@ -481,7 +481,7 @@ export class TeamAnalyticsComponent implements OnInit, OnDestroy {
         color: sourceColors[src] ?? '#888'
       }));
 
-    this.busiestSource = this.sourceStat[0]?.name ?? 'â€“';
+    this.busiestSource = this.sourceStat[0]?.name ?? '-';
 
     // Heatmap
     const maxH = Math.max(...hourlyTotals, 1);
