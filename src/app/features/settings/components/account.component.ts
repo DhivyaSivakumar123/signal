@@ -20,7 +20,6 @@ import { MatIconModule } from '@angular/material/icon';
         </div>
         <div class="account-meta">
           <h3 class="account-name">{{ user.name }}</h3>
-          <span class="account-role-badge">{{ user.role }}</span>
         </div>
       </div>
 
