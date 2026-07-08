@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { Subscription, combineLatest, first } from 'rxjs';
@@ -45,7 +45,7 @@ interface PeakSlot {
         <div class="analytics__title-group">
           <h1 class="analytics__title">Team Load</h1>
           <span class="analytics__subtitle" *ngIf="teamLoad">
-            {{ teamLoad.fromDate | date:'MMM d' }} â€“ {{ teamLoad.toDate | date:'MMM d, yyyy' }}
+            {{ teamLoad.fromDate | date:'MMM d' }} to {{ teamLoad.toDate | date:'MMM d, yyyy' }}
           </span>
         </div>
         <mat-button-toggle-group [(value)]="daysFilter" (change)="onDaysChange($event)" class="toggle-group">
