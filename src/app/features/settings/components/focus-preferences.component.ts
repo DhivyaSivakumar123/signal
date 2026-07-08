@@ -6,39 +6,59 @@ import { Subscription } from 'rxjs';
 import { UserPreference } from '../../../core/models/triage.model';
 import { TriageActions } from '../../../state/triage/triage.actions';
 import { selectPreferences, selectTriageLoading } from '../../../state/triage/triage.selectors';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-focus-preferences',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatIconModule],
   template: `
     <div class="preferences-form">
+      <!-- Stated Priorities Description & Textarea -->
       <div class="form-group">
-        <label class="form-label">Stated Priorities</label>
+        <label class="form-label">Custom Instruction Priorities</label>
+        <span class="form-helper">
+          Describe what kinds of messages are most critical to you. The AI Scorer will use this context to prioritize signals.
+        </span>
         <textarea class="form-textarea" 
                   [(ngModel)]="statedPriorities" 
-                  placeholder="e.g. Focus on billing queries, skip marketing updates..."></textarea>
+                  placeholder="e.g. Focus on database infrastructure alerts, skip general marketing newsletters, mark billing tickets as urgent..."></textarea>
       </div>
 
+      <!-- Digest Configuration Row -->
       <div class="form-row">
         <div class="form-group flex-1">
           <label class="form-label">Daily Digest Time</label>
-          <input type="time" class="form-input" [(ngModel)]="digestTime">
+          <span class="form-helper">When should we compile your digest?</span>
+          <div class="input-with-icon">
+            <mat-icon class="input-icon">schedule</mat-icon>
+            <input type="time" class="form-input" [(ngModel)]="digestTime">
+          </div>
         </div>
         
         <div class="form-group flex-1">
           <label class="form-label">Digest Channel</label>
-          <select class="form-select" [(ngModel)]="digestChannel">
-            <option value="NONE">Disabled</option>
-            <option value="EMAIL">Email</option>
-            <option value="SLACK">Slack</option>
-          </select>
+          <span class="form-helper">Where should we deliver it?</span>
+          <div class="input-with-icon">
+            <mat-icon class="input-icon">chat_bubble_outline</mat-icon>
+            <select class="form-select" [(ngModel)]="digestChannel">
+              <option value="NONE">Disabled</option>
+              <option value="EMAIL">Send via Email</option>
+              <option value="SLACK">Send via Slack</option>
+            </select>
+          </div>
         </div>
       </div>
 
+      <!-- Save Button Block -->
       <div class="form-actions">
         <button class="save-btn" [disabled]="saving" (click)="save()">
-          {{ saving ? 'Saving...' : 'Save Preferences' }}
+          <span *ngIf="!saving" class="btn-content">
+            <mat-icon>done</mat-icon> Save Preferences
+          </span>
+          <span *ngIf="saving" class="btn-content">
+            Saving...
+          </span>
         </button>
       </div>
     </div>
@@ -48,13 +68,15 @@ import { selectPreferences, selectTriageLoading } from '../../../state/triage/tr
     
     .preferences-form {
       padding: $space-6;
+      display: flex;
+      flex-direction: column;
+      gap: $space-5;
     }
     
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: $space-2;
-      margin-bottom: $space-4;
+      gap: 6px;
       
       &.flex-1 {
         flex: 1;
@@ -63,61 +85,114 @@ import { selectPreferences, selectTriageLoading } from '../../../state/triage/tr
     
     .form-row {
       display: flex;
-      gap: $space-4;
-      margin-bottom: $space-5;
+      flex-direction: column;
+      gap: $space-5;
+    }
+
+    @media(min-width: 600px) {
+      .form-row {
+        flex-direction: row;
+      }
     }
     
     .form-label {
       font-family: $font-body;
       font-size: $text-xs;
       font-weight: $weight-semibold;
-      color: $text-secondary;
+      color: $text-primary;
+    }
+
+    .form-helper {
+      font-family: $font-body;
+      font-size: 11px;
+      color: $text-muted;
+      line-height: 1.3;
+      margin-bottom: 2px;
     }
     
     .form-input, .form-select, .form-textarea {
       font-family: $font-body;
       font-size: $text-sm;
-      background-color: $bg-elevated;
+      background-color: rgba(255, 255, 255, 0.02);
       border: 1px solid $border-subtle;
       border-radius: $radius-badge;
       color: $text-primary;
       padding: $space-2 $space-3;
       outline: none;
-      transition: border-color 150ms ease;
+      transition: all 150ms ease;
+      width: 100%;
+      box-sizing: border-box;
       
       &:focus {
-        border-color: $border-focus;
+        border-color: #3683f6;
+        background-color: rgba(255, 255, 255, 0.04);
+        box-shadow: 0 0 0 2px rgba(54, 131, 246, 0.15);
       }
     }
     
     .form-textarea {
-      min-height: 100px;
+      min-height: 90px;
       resize: vertical;
+      line-height: 1.4;
     }
-    
-    .form-input, .form-select {
-      height: 38px;
+
+    .input-with-icon {
+      position: relative;
+      width: 100%;
+      
+      .form-input, .form-select {
+        padding-left: 36px;
+        height: 38px;
+      }
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $text-muted;
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      pointer-events: none;
     }
     
     .form-actions {
       display: flex;
       justify-content: flex-end;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: $space-5;
     }
     
     .save-btn {
-      background-color: $border-focus;
-      color: $text-primary;
+      background-color: #3683f6;
+      color: #ffffff;
       border: none;
       border-radius: $radius-badge;
-      padding: $space-2 $space-4;
+      padding: $space-2 $space-5;
       font-family: $font-body;
-      font-size: $text-sm;
-      font-weight: $weight-medium;
+      font-size: $text-xs;
+      font-weight: $weight-semibold;
       cursor: pointer;
-      transition: background-color 150ms ease;
+      box-shadow: 0 1px 2px rgba(54, 131, 246, 0.2);
+      transition: all 150ms ease;
+      height: 34px;
       
-      &:hover {
-        background-color: lighten($border-focus, 10%);
+      .btn-content {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        mat-icon { font-size: 14px; width: 14px; height: 14px; }
+      }
+      
+      &:hover:not(:disabled) {
+        background-color: #4a91f8;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
       }
     }
   `]

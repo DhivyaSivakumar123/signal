@@ -39,7 +39,7 @@ import { FocusPreferencesComponent } from './components/focus-preferences.compon
   styles: [`
     @import 'styles/tokens';
 
-    .settings { padding: $space-6; max-width: 640px; }
+    .settings { padding: $space-6; max-width: 800px; }
     .settings__title {
       font-family: $font-display;
       font-size: $text-xl;
@@ -51,17 +51,18 @@ import { FocusPreferencesComponent } from './components/focus-preferences.compon
       border: 1px solid $border-subtle;
       border-radius: $radius-card;
       overflow: hidden;
-      margin-bottom: $space-4;
+      margin-bottom: $space-5;
     }
     .settings__panel-header {
       font-family: $font-display;
       font-size: $text-xs;
-      color: $text-primary;
+      color: $text-muted;
       font-weight: $weight-semibold;
-      letter-spacing: 1px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
       padding: $space-4 $space-6;
       border-bottom: 1px solid $border-subtle;
-      background: rgba(255, 255, 255, 0.02);
+      background: rgba(255, 255, 255, 0.015);
     }
   `]
 })
