@@ -27,7 +27,7 @@ import { MatIconModule } from '@angular/material/icon';
             <svg *ngIf="t.provider === 'OUTLOOK'" viewBox="0 0 24 24" class="brand-svg"><path fill="#0078D4" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8.5 13.5H9v-2.1h1.5v2.1zm0-3.2H9V8.5h1.5v4.8zm4 3.2h-1.5v-4.8h1.5v4.8zm0-5.9h-1.5V8.5h1.5v2.1z"/></svg>
 
             <!-- Calendar Icon -->
-            <svg *ngIf="t.provider === 'CALENDAR'" viewBox="0 0 24 24" class="brand-svg"><path fill="#34A853" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/><span fill="#34A853" class="cal-dot"></span></svg>
+            <svg *ngIf="t.provider === 'CALENDAR'" viewBox="0 0 24 24" class="brand-svg"><path fill="#34A853" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/><rect x="8" y="12" width="8" height="5" fill="#34A853" rx="1"/></svg>
           </div>
           <div class="tool-meta">
             <span class="tool-name">{{ t.label }}</span>
