@@ -14,3 +14,32 @@ $signal-theme: mat.define-dark-theme((
 ));
 
 @include mat.all-component-themes($signal-theme);
+
+/* ─── Custom Google Drive-style Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.38);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
