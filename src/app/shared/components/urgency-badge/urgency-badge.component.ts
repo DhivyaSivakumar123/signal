@@ -7,7 +7,7 @@ import { Urgency } from '../../../core/models/triage.model';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <span class="badge badge--{{urgency?.toLowerCase()}}">{{ label }}</span>
+    <span class="badge badge--{{urgency.toLowerCase()}}">{{ label }}</span>
   `,
   styles: [`
     @import 'styles/tokens';
