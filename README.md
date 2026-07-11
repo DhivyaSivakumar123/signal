@@ -1,11 +1,8 @@
 # ⚡ Signal — Frontend
 
-![Angular](https://img.shields.io/badge/Angular_17-DD0031?style=for-the-badge&logo=angular&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
-![NgRx](https://img.shields.io/badge/NgRx-BA263E?style=for-the-badge&logo=reactivex&logoColor=white)
-![Sass](https://img.shields.io/badge/Sass-CC6699?style=for-the-badge&logo=sass&logoColor=white)
-![Angular Material](https://img.shields.io/badge/Angular_Material-757575?style=for-the-badge&logo=angular&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+<p align="left">
+  <img src="https://skillicons.dev/icons?i=angular,ts,sass,vite" />
+</p>
 
 ---
 
