@@ -2,15 +2,17 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { Integration, Provider } from '../../../core/models/integration.model';
 import { IntegrationsActions } from '../../../state/integrations/integrations.actions';
-import { selectIntegrations, selectIntegrationsLoading } from '../../../state/integrations/integrations.selectors';
+import { selectIntegrations, selectIntegrationsLoading, selectIntegrationsLoaded } from '../../../state/integrations/integrations.selectors';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-connected-tools',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, MatIconModule, MatProgressSpinnerModule],
   template: `
     <div class="tools-grid">
       <div class="tool-card" *ngFor="let t of tools" [ngClass]="{'tool-card--connected': isConnected(t.provider)}">
@@ -37,31 +39,46 @@ import { MatIconModule } from '@angular/material/icon';
 
         <!-- Footer: Status & Actions -->
         <div class="tool-footer">
-          <div class="status-indicator status-indicator--{{ getActiveStatus(t.provider).toLowerCase() }}">
-            <span class="status-dot"></span>
-            <span class="status-text">{{ getActiveStatus(t.provider) }}</span>
-          </div>
-          
-          <div class="actions">
-            <button *ngIf="getActiveStatus(t.provider) === 'Disconnected'" 
-                    class="btn btn--connect" 
-                    [disabled]="loading"
-                    (click)="connect(t.provider)">
-              <mat-icon>add</mat-icon> Connect
-            </button>
-            <button *ngIf="getActiveStatus(t.provider) === 'EXPIRED' || getActiveStatus(t.provider) === 'REVOKED'" 
-                    class="btn btn--reconnect" 
-                    [disabled]="loading"
-                    (click)="connect(t.provider)">
-              <mat-icon>refresh</mat-icon> Reconnect
-            </button>
-            <button *ngIf="getActiveStatus(t.provider) === 'ACTIVE'" 
-                    class="btn btn--disconnect" 
-                    [disabled]="loading"
-                    (click)="disconnect(t.provider)">
-              {{ loading ? 'Disconnecting...' : 'Disconnect' }}
-            </button>
-          </div>
+          <!-- Checking state: integrations not yet loaded -->
+          <ng-container *ngIf="checking; else resolvedState">
+            <div class="status-indicator status-indicator--checking">
+              <span class="status-dot status-dot--pulse"></span>
+              <span class="status-text">Checking...</span>
+            </div>
+            <div class="actions">
+              <button class="btn btn--checking" disabled>
+                <mat-icon class="spin-icon">sync</mat-icon> Checking...
+              </button>
+            </div>
+          </ng-container>
+
+          <!-- Resolved state: show real status + correct button -->
+          <ng-template #resolvedState>
+            <div class="status-indicator status-indicator--{{ getActiveStatus(t.provider).toLowerCase() }}">
+              <span class="status-dot"></span>
+              <span class="status-text">{{ getActiveStatus(t.provider) }}</span>
+            </div>
+            <div class="actions">
+              <button *ngIf="getActiveStatus(t.provider) === 'Disconnected'"
+                      class="btn btn--connect"
+                      [disabled]="loading"
+                      (click)="connect(t.provider)">
+                <mat-icon>add</mat-icon> Connect
+              </button>
+              <button *ngIf="getActiveStatus(t.provider) === 'EXPIRED' || getActiveStatus(t.provider) === 'REVOKED'"
+                      class="btn btn--reconnect"
+                      [disabled]="loading"
+                      (click)="connect(t.provider)">
+                <mat-icon>refresh</mat-icon> Reconnect
+              </button>
+              <button *ngIf="getActiveStatus(t.provider) === 'ACTIVE'"
+                      class="btn btn--disconnect"
+                      [disabled]="loading"
+                      (click)="disconnect(t.provider)">
+                {{ loading ? 'Disconnecting...' : 'Disconnect' }}
+              </button>
+            </div>
+          </ng-template>
         </div>
       </div>
     </div>
@@ -198,6 +215,28 @@ import { MatIconModule } from '@angular/material/icon';
         .status-dot { background: #ea4335; }
         .status-text { color: #ea4335; }
       }
+
+      &--checking {
+        background: rgba(251, 188, 4, 0.08);
+        border-color: rgba(251, 188, 4, 0.2);
+        .status-dot {
+          background: #fbbc04;
+          &--pulse {
+            animation: pulse-dot 1.2s ease-in-out infinite;
+          }
+        }
+        .status-text { color: #fbbc04; }
+      }
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
     
     .btn {
@@ -244,12 +283,24 @@ import { MatIconModule } from '@angular/material/icon';
           color: #ea4335;
         }
       }
+
+      &--checking {
+        background-color: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        color: $text-muted;
+        cursor: not-allowed;
+        opacity: 0.7;
+        .spin-icon {
+          animation: spin 1s linear infinite;
+        }
+      }
     }
   `]
 })
 export class ConnectedToolsComponent implements OnInit, OnDestroy {
   integrations: Integration[] = [];
   loading = false;
+  checking = true; // true until first load of integrations completes
 
   private store = inject(Store);
   private sub = new Subscription();
@@ -262,11 +313,29 @@ export class ConnectedToolsComponent implements OnInit, OnDestroy {
   ];
 
   ngOnInit(): void {
+    // If already loaded in store (navigated back), skip checking state
+    this.store.select(selectIntegrationsLoaded).pipe(take(1)).subscribe(loaded => {
+      if (loaded) this.checking = false;
+    });
+
+    // Always re-fetch fresh data
+    this.store.dispatch(IntegrationsActions.loadIntegrations());
+
+    // Track integrations data
     this.sub.add(
-      this.store.select(selectIntegrations).subscribe(data => this.integrations = data || [])
+      this.store.select(selectIntegrations).subscribe(data => {
+        this.integrations = data || [];
+      })
     );
+
+    // Track loading: once loading goes false, checking is done
     this.sub.add(
-      this.store.select(selectIntegrationsLoading).subscribe(loading => this.loading = loading)
+      this.store.select(selectIntegrationsLoading).subscribe(loading => {
+        this.loading = loading;
+        if (!loading && this.checking) {
+          this.checking = false;
+        }
+      })
     );
   }
 
