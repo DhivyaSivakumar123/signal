@@ -60,13 +60,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
             <div class="actions">
               <button *ngIf="getActiveStatus(t.provider) === 'Disconnected'"
                       class="btn btn--connect"
-                      [disabled]="loading"
+                      [disabled]="actionLoading"
                       (click)="connect(t.provider)">
                 <mat-icon>add</mat-icon> Connect
               </button>
               <button *ngIf="getActiveStatus(t.provider) === 'EXPIRED' || getActiveStatus(t.provider) === 'REVOKED'"
                       class="btn btn--reconnect"
-                      [disabled]="loading"
+                      [disabled]="actionLoading"
                       (click)="connect(t.provider)">
                 <mat-icon>refresh</mat-icon> Reconnect
               </button>
