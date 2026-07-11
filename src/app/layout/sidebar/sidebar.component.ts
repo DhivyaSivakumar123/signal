@@ -6,6 +6,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { selectFocusSlots, selectSelectedSlot, selectNowCount } from '../../state/triage/triage.selectors';
+import { selectIntegrationsLoading } from '../../state/integrations/integrations.selectors';
 import { TriageActions } from '../../state/triage/triage.actions';
 import { IntegrationsActions } from '../../state/integrations/integrations.actions';
 import { FocusSlot } from '../../core/models/triage.model';
@@ -19,9 +20,9 @@ import { FocusSlot } from '../../core/models/triage.model';
 
       <!-- Drive-style "+ Sync Now" Pill Button -->
       <div class="sidebar__action-container">
-        <button class="sidebar__sync-btn" (click)="triggerSync()" [matTooltip]="collapsed ? 'Sync Now' : ''">
-          <mat-icon class="sync-btn__icon">sync</mat-icon>
-          <span class="sync-btn__label" *ngIf="!collapsed">Sync Now</span>
+        <button class="sidebar__sync-btn" (click)="triggerSync()" [disabled]="syncing" [matTooltip]="collapsed ? 'Sync Now' : ''">
+          <mat-icon class="sync-btn__icon" [class.sync-btn__icon--spinning]="syncing">sync</mat-icon>
+          <span class="sync-btn__label" *ngIf="!collapsed">{{ syncing ? 'Syncing...' : 'Sync Now' }}</span>
         </button>
       </div>
 
@@ -127,6 +128,11 @@ import { FocusSlot } from '../../core/models/triage.model';
         background: lighten(#1F2A45, 5%);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
       }
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
     }
 
     .sync-btn__icon {
@@ -136,6 +142,16 @@ import { FocusSlot } from '../../core/models/triage.model';
       display: flex;
       align-items: center;
       justify-content: center;
+      
+      &--spinning {
+        animation: spin 1.2s linear infinite;
+      }
+    }
+
+    @keyframes spin {
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     .sidebar__nav {
@@ -220,6 +236,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   nowCount = 0;
   focusSlots: FocusSlot[] = [];
   selectedSlot: FocusSlot | null = null;
+  syncing = false;
 
   ngOnInit() {
     this.sub.add(
@@ -230,6 +247,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
     );
     this.sub.add(
       this.store.select(selectSelectedSlot).subscribe(s => this.selectedSlot = s)
+    );
+    this.sub.add(
+      this.store.select(selectIntegrationsLoading).subscribe(loading => this.syncing = loading)
     );
   }
 
