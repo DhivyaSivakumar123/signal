@@ -18,6 +18,14 @@
   align-items: center;
   gap: $space-3;
   min-width: 200px;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    .topbar__wordmark {
+      color: #8ab4f8;
+    }
+  }
 }
 
 .topbar__menu-btn {
@@ -44,6 +52,7 @@
   font-weight: $weight-semibold;
   color: $text-primary;
   letter-spacing: 2px;
+  transition: color 150ms ease;
 }
 
 .topbar__search {
