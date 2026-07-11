@@ -15,7 +15,7 @@ import { MatIconModule } from '@angular/material/icon';
       <!-- Profile Header Summary -->
       <div class="account-header">
         <div class="account-avatar">
-          <img *ngIf="user.pictureUrl" [src]="user.pictureUrl" class="avatar-img" [alt]="user.name" />
+          <img *ngIf="user.pictureUrl" [src]="user.pictureUrl" referrerpolicy="no-referrer" class="avatar-img" [alt]="user.name" />
           <div *ngIf="!user.pictureUrl" class="avatar-initials">{{ userInitials }}</div>
         </div>
         <div class="account-meta">
