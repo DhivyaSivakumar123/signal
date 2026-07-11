@@ -76,7 +76,6 @@ import { FocusSlot } from '../../core/models/triage.model';
     .sidebar {
       width: $sidebar-width;
       background: $sidebar-bg;
-      border-right: 1px solid $border-subtle;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -195,9 +194,9 @@ import { FocusSlot } from '../../core/models/triage.model';
       &--now { background: rgba($urgency-now-accent, 0.2); color: $urgency-now-accent; }
     }
 
-    .sidebar__divider { height: 1px; background: $border-subtle; margin: $space-3 $space-3; }
+    .sidebar__divider { display: none; }
 
-    .sidebar__section { padding: 0 $space-3 $space-3; }
+    .sidebar__section { padding: 0 $space-3 $space-3; margin-top: $space-5; }
     .sidebar__section-label {
       font-family: $font-display;
       font-size: $text-xs;
