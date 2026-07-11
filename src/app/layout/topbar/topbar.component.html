@@ -10,7 +10,7 @@
   <!-- Right: notification bell + avatar -->
   <div class="topbar__right">
     <button class="topbar__icon-btn" matTooltip="Send digest now" (click)="sendDigest()">
-      <mat-icon>notifications_none</mat-icon>
+      <mat-icon>send</mat-icon>
     </button>
     <div class="topbar__avatar" [matTooltip]="user?.email ?? ''" (click)="openUserMenu()">
       <img *ngIf="resolvedAvatarUrl" [src]="resolvedAvatarUrl" referrerpolicy="no-referrer" class="topbar__avatar-img" [alt]="user?.name" />
