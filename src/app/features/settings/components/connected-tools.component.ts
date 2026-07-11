@@ -2,10 +2,9 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
 import { Integration, Provider } from '../../../core/models/integration.model';
 import { IntegrationsActions } from '../../../state/integrations/integrations.actions';
-import { selectIntegrations, selectIntegrationsLoading, selectIntegrationsLoaded } from '../../../state/integrations/integrations.selectors';
+import { selectIntegrations, selectIntegrationsLoading } from '../../../state/integrations/integrations.selectors';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
@@ -73,9 +72,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
               </button>
               <button *ngIf="getActiveStatus(t.provider) === 'ACTIVE'"
                       class="btn btn--disconnect"
-                      [disabled]="loading"
+                      [disabled]="actionLoading"
                       (click)="disconnect(t.provider)">
-                {{ loading ? 'Disconnecting...' : 'Disconnect' }}
+                {{ actionLoading ? 'Disconnecting...' : 'Disconnect' }}
               </button>
             </div>
           </ng-template>
@@ -299,8 +298,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 })
 export class ConnectedToolsComponent implements OnInit, OnDestroy {
   integrations: Integration[] = [];
-  loading = false;
-  checking = true; // true until first load of integrations completes
+  checking = true;       // true until the initial integrations fetch completes
+  actionLoading = false; // true only during an explicit connect/disconnect action
 
   private store = inject(Store);
   private sub = new Subscription();
@@ -313,12 +312,7 @@ export class ConnectedToolsComponent implements OnInit, OnDestroy {
   ];
 
   ngOnInit(): void {
-    // If already loaded in store (navigated back), skip checking state
-    this.store.select(selectIntegrationsLoaded).pipe(take(1)).subscribe(loaded => {
-      if (loaded) this.checking = false;
-    });
-
-    // Always re-fetch fresh data
+    // Always fetch fresh data — checking=true until this resolves
     this.store.dispatch(IntegrationsActions.loadIntegrations());
 
     // Track integrations data
@@ -328,12 +322,15 @@ export class ConnectedToolsComponent implements OnInit, OnDestroy {
       })
     );
 
-    // Track loading: once loading goes false, checking is done
+    // When the fetch completes (loading → false), end the checking state
+    // Also reset actionLoading when any action completes
     this.sub.add(
       this.store.select(selectIntegrationsLoading).subscribe(loading => {
-        this.loading = loading;
         if (!loading && this.checking) {
           this.checking = false;
+        }
+        if (!loading) {
+          this.actionLoading = false;
         }
       })
     );
@@ -354,12 +351,14 @@ export class ConnectedToolsComponent implements OnInit, OnDestroy {
   }
 
   connect(provider: Provider): void {
+    this.actionLoading = true;
     this.store.dispatch(IntegrationsActions.connectIntegration({ provider }));
   }
 
   disconnect(provider: Provider): void {
     const matched = this.integrations.find(i => i.provider === provider);
     if (matched) {
+      this.actionLoading = true;
       this.store.dispatch(IntegrationsActions.deleteIntegration({ id: matched.id }));
     }
   }
