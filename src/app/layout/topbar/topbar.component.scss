@@ -32,6 +32,12 @@
   &:hover { background: $bg-elevated; color: $text-primary; }
 }
 
+.topbar__logo {
+  height: 24px;
+  width: auto;
+  display: block;
+}
+
 .topbar__wordmark {
   font-family: $font-display;
   font-size: $text-lg;
