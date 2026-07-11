@@ -1,71 +1,64 @@
-# ⚡ Signal Frontend Application
+# ⚡ Signal — Frontend
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular" />
-  <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/NgRx-BA263E?style=for-the-badge&logo=ngrx&logoColor=white" alt="NgRx" />
-  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
-  <img src="https://img.shields.io/badge/Sass-CC6699?style=for-the-badge&logo=sass&logoColor=white" alt="Sass" />
-</p>
+![Angular](https://img.shields.io/badge/Angular_17-DD0031?style=for-the-badge&logo=angular&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![NgRx](https://img.shields.io/badge/NgRx-BA263E?style=for-the-badge&logo=reactivex&logoColor=white)
+![Sass](https://img.shields.io/badge/Sass-CC6699?style=for-the-badge&logo=sass&logoColor=white)
+![Angular Material](https://img.shields.io/badge/Angular_Material-757575?style=for-the-badge&logo=angular&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 
 ---
 
 ## 📖 Overview
 
-Welcome to the **Signal Frontend**! This is a state-of-the-art developer productivity and triage workspace built with **Angular 17**, **TypeScript**, and **NgRx**. It acts as a unified hub that ingests, scores, and prioritizes workspace messages (Slack, Gmail, Outlook, Calendar) so you can focus on what actually matters without context switching.
+**Signal Frontend** is a smart developer productivity workspace built with **Angular 17** Standalone Components, **NgRx** state management, and a premium dark-mode design system. It ingests, scores, and surfaces your most important workspace messages from Slack, Gmail, Outlook, and Calendar so you can focus on what truly matters — without context switching.
 
 ---
 
 ## ✨ Features
 
-- **📬 Today's Triage Feed:** Smart, ranked view of your most urgent daily messages.
-- **📊 Team Load Charts:** Interactive dashboard showing team volume and communication bottlenecks.
-- **⚙️ Connected Integrations Workspace:**
-  - Real-time connection management dashboard (Slack, Gmail, Outlook, Calendar).
-  - Dynamic **"Checking..."** connection validator during initial status retrieval.
-  - One-click connect, reconnect, and disconnect flows.
-- **⏱️ Focus Slots:** Time blocking recommendations based on calendar availability.
-- **🎨 Premium User Experience:** Elegant dark-mode layout, glassmorphism containers, smooth CSS transitions, and an animated **"Sync Now"** state.
+- **📬 Today's Triage Feed** — Ranked, urgency-scored view of your daily messages.
+- **📊 Team Load Dashboard** — Interactive charts showing team communication volume and bottlenecks.
+- **⚙️ Connected Integrations** — Real-time connection management with dynamic **Checking...** validation state.
+- **⏱️ Focus Slots** — Time-block recommendations derived from calendar availability.
+- **📧 Digest Notifications** — On-demand email summaries of your top priorities, dispatched via SMTP.
+- **🎨 Premium Dark UI** — Glassmorphism containers, micro-animations, and animated Sync Now button state.
 
 ---
 
-## 🛠️ Technology Stack
+## 🛠️ Tech Stack
 
-- **Framework:** [Angular v17](https://angular.dev/) (Standalone Components Architecture)
-- **State Management:** [NgRx v17](https://ngrx.io/) (Store, Effects, Selectors)
-- **Styles:** Vanilla CSS with Sass (SCSS) design tokens
-- **Component Suite:** [Angular Material v17](https://material.angular.io/)
-- **Icons:** Google Material Symbols & Brand SVGs
+| Layer | Technology |
+|---|---|
+| Framework | Angular 17 (Standalone Components) |
+| State | NgRx 17 (Store, Effects, Selectors) |
+| Styles | SCSS with design token system |
+| UI Library | Angular Material 17 |
+| Build Tool | Vite (via Angular CLI) |
+| Language | TypeScript 5 |
 
 ---
 
 ## 🚀 Getting Started
 
-### 📋 Prerequisites
-Ensure you have the following installed:
-- [Node.js](https://nodejs.org/) (v18.x or above recommended)
-- [Angular CLI](https://github.com/angular/angular-cli) (`npm install -g @angular/cli`)
+### Prerequisites
+- [Node.js](https://nodejs.org/) v18 or above
+- [Angular CLI](https://github.com/angular/angular-cli): `npm install -g @angular/cli`
 
-### 📦 Installation
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+### Installation
+```bash
+cd frontend
+npm install
+```
 
-### 💻 Running Development Server
-Run the local dev server:
-   ```bash
-   npm run dev
-   ```
-Open your browser and navigate to `http://localhost:4200/`. The app will reload automatically when source code changes.
+### Running Development Server
+```bash
+npm run dev
+```
+Open `http://localhost:4200/` in your browser. The app hot-reloads on file changes.
 
-### 🏗️ Production Build
-Compile production assets:
-   ```bash
-   npm run build
-   ```
-The output files will be located in the `dist/` directory.
+### Production Build
+```bash
+npm run build
+```
+Build artifacts are output to the `dist/` directory.
