@@ -1,0 +1,21 @@
+{
+  "framework": "angular",
+  "buildCommand": "npm run build -- --configuration production",
+  "outputDirectory": "dist/frontend/browser",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "env": {
+    "API_URL": "https://gateway-service-871301543752.us-central1.run.app"
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    }
+  ]
+}
