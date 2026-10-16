@@ -59,3 +59,24 @@ Open `http://localhost:4200/` in your browser. The app hot-reloads on file chang
 npm run build
 ```
 Build artifacts are output to the `dist/` directory.
+
+---
+
+## 👨‍💻 What I Built (Akaash-S)
+
+* **Google Drive-Inspired Dark Design System**:
+  * Overhauled the application aesthetic with high-contrast surfaces, glassmorphism cards, and Google Drive-inspired custom scrollbars.
+  * Built the application shell, responsive navigation sidebar, and topbar layout.
+* **NgRx State Management & Live Sync**:
+  * Designed and implemented reactive state flows across `triage`, `integrations`, `auth`, and `analytics`.
+  * Built the interactive **Sync Now** action in the sidebar with an animated spinning loader and optimistic disabled states.
+* **Connected Tools & Integration Settings**:
+  * Redesigned the integration manager with dynamic "Checking..." health-check status to prevent state flashing.
+  * Separated item-level action loaders from global integration fetch states.
+* **Team Load Analytics & Data Visualization**:
+  * Built the Team Load metrics dashboard with KPI cards, source distribution breakdowns, and hourly interruption heatmaps powered by **Chart.js**.
+  * Registered dynamic Chart.js scales and transformed raw backend rollups into responsive frontend models.
+* **OAuth Identity & Avatar Handling**:
+  * Integrated real Google and Microsoft profile avatar rendering with automated Gravatar fallback and high-fidelity provider badges.
+  * Enforced `no-referrer` image security policies to prevent CDN loading blocks.
+
