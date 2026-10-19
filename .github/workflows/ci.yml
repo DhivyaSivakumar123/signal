@@ -2,9 +2,9 @@ name: Frontend CI
 
 on:
   push:
-    branches: [ main, feat/* ]
+    branches: [ main, Akaash, feat/* ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, Akaash ]
 
 jobs:
   build:
