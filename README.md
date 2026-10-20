@@ -80,3 +80,17 @@ Build artifacts are output to the `dist/` directory.
   * Integrated real Google and Microsoft profile avatar rendering with automated Gravatar fallback and high-fidelity provider badges.
   * Enforced `no-referrer` image security policies to prevent CDN loading blocks.
 
+---
+
+## 📸 Screenshots
+
+| Triage Feed & Dark UI | Team Load & Analytics Dashboard |
+| :---: | :---: |
+| ![Triage Feed](docs/screenshots/triage_feed.png) | ![Team Load Analytics](docs/screenshots/team_analytics.png) |
+| *Prioritized daily message stream with urgency badges* | *Chart.js hourly interruption heatmaps & source distribution* |
+
+| Connected Integrations Manager | Focus Time & Calendar Slots |
+| :---: | :---: |
+| ![Integrations](docs/screenshots/integrations.png) | ![Focus Slots](docs/screenshots/focus_slots.png) |
+| *Real-time OAuth provider status with "Checking..." validation* | *Calendar-derived focus blocks and scheduling recommendations* |
+
