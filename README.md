@@ -95,9 +95,7 @@ npm test -- --watch=false --browsers=ChromeHeadless
 
 ---
 
-## 🛠️ What I Built
-
-*Primary contributor: Akaash-S (verified with `git shortlog -sn --all`: 56 of 59 commits in this repository, 94.9% of project commit history).*
+## 🛠️ What We Built
 
 ### Key Components & Implementations:
 - **Angular 17 Standalone Components**:
