@@ -6,7 +6,7 @@
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "env": {
-    "API_URL": "https://gateway-service-871301543752.us-central1.run.app"
+    "API_URL": "https://gateway-service-644308977417.us-central1.run.app"
   },
   "headers": [
     {

@@ -21,7 +21,7 @@ function loadEnv() {
 
 loadEnv();
 
-const apiUrl = process.env.API_URL || 'https://gateway-service-871301543752.us-central1.run.app';
+const apiUrl = process.env.API_URL || 'https://gateway-service-644308977417.us-central1.run.app';
 
 const configContent = `{
   "apiUrl": "${apiUrl}"
