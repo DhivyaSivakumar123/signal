@@ -56,9 +56,14 @@
 
 ### Installation
 ```bash
-cd frontend
-npm install
+# Clone the repository
+git clone https://github.com/DhivyaSivakumar123/signal.git
+cd signal
+
+# Install dependencies
+npm ci
 ```
+*(Note: The root of this repository is the Angular application directly; there is no inner `frontend/` directory.)*
 
 ### Running Development Server
 Runs the environment configuration script and starts the Angular development server:
@@ -82,6 +87,43 @@ npm run watch
 ### Running Unit Tests
 Executes unit tests via Karma and Jasmine:
 ```bash
-npm test
+npm test -- --watch=false --browsers=ChromeHeadless
 ```
+
+> [!NOTE]
+> **Known gaps**: The repository currently contains **0 unit tests** (no `*.spec.ts` files exist in `src/`). Test coverage currently relies on Cypress end-to-end specifications located under `cypress/e2e/` (`login.cy.ts`, `onboarding.cy.ts`, `triage-feed.cy.ts`).
+
+---
+
+## 🛠️ What I Built
+
+*Primary contributor: Akaash-S (verified with `git shortlog -sn --all`: 56 of 59 commits in this repository, 94.9% of project commit history).*
+
+### Key Components & Implementations:
+- **Angular 17 Standalone Components**:
+  - Implemented modern Angular 17 standalone architecture with strict control flow (`@if`, `@for`, `@switch`), signals, and dependency injection (`inject()`) without `NgModule` boilerplate.
+  - Page components: `LoginComponent`, `OAuthCallbackComponent`, `OnboardingComponent` (`WelcomeStepComponent`, `ConnectStepComponent`, `DoneStepComponent`), `TriageComponent`, `TeamAnalyticsComponent`, and `SettingsComponent`.
+  - Shell and layout components: `AppShellComponent`, `SidebarComponent`, `TopbarComponent`.
+  - Shared design components: `TriageCardComponent`, `UrgencyBadgeComponent`, `SourceIconComponent`, `ToastComponent`, `EmptyStateComponent`.
+- **NgRx Centralized State Management**:
+  - Engineered 4 feature store slices with actions, effects, reducers, and selectors:
+    - **`auth`** (`auth.actions.ts`, `auth.effects.ts`, `auth.reducer.ts`, `auth.selectors.ts`): OAuth2 code exchange, token persistence, user session profile, and role state.
+    - **`integrations`** (`integrations.actions.ts`, `integrations.effects.ts`, `integrations.reducer.ts`, `integrations.selectors.ts`): Multi-source connection status, tool disconnections, and dynamic validation states.
+    - **`triage`** (`triage.actions.ts`, `triage.effects.ts`, `triage.reducer.ts`, `triage.selectors.ts`): Feed triage loading, urgency feedback recording, Focus Slot management, and user notification preferences.
+    - **`analytics`** (`analytics.actions.ts`, `analytics.effects.ts`, `analytics.reducer.ts`, `analytics.selectors.ts`): Team communication load volume, interruption heatmaps, and workload recommendations.
+- **Chart.js & ng2-charts Team Analytics**:
+  - `LoadChartComponent` & `TeamAnalyticsComponent`: Interactive charts rendering hourly interruption distributions and message source breakdowns using Chart.js 4 and ng2-charts 6.
+- **Connected Integrations Page**:
+  - `ConnectedToolsComponent`: Real-time management interface for live Google Gmail/Calendar integrations and Slack/Outlook stubs, featuring live `isChecking` validation status and OAuth authorization links.
+- **Animated "Sync Now" State**:
+  - `TopbarComponent`: Real-time on-demand sync button triggering the `syncIntegrations` action with animated spinning refresh icon and disabled state while `isSyncing$` is active.
+
+---
+
+## 📸 Application Screenshots (Visual Guide)
+
+*Recommended screen captures for visual documentation:*
+- **Today's Triage Feed (`/triage`)**: Showing the priority breakdown (`NOW`, `TODAY`, `THIS_WEEK`, `FYI`), urgency score badges, Gmail/Calendar unread message snippets, and the Focus Slots recommendation card.
+- **Team Load Analytics (`/team-analytics`)**: Showing the Chart.js hourly communication volume bar chart, source distribution pie chart, and automated interruption mitigation recommendations.
+- **Connected Tools / Integrations (`/settings`)**: Showing connection status cards for Gmail, Google Calendar, Slack, and Microsoft Outlook, along with the active "Sync Now" button state.
 
