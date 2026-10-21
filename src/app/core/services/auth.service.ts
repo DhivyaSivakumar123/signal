@@ -43,8 +43,12 @@ export class AuthService {
 
   // Token helpers — store access token in localStorage
   storeTokens(tokens: AuthTokens): void {
-    localStorage.setItem('signal_access_token', tokens.accessToken);
-    localStorage.setItem('signal_refresh_token', tokens.refreshToken);
+    if (tokens.accessToken) {
+      localStorage.setItem('signal_access_token', tokens.accessToken);
+    }
+    if (tokens.refreshToken) {
+      localStorage.setItem('signal_refresh_token', tokens.refreshToken);
+    }
   }
   getAccessToken(): string | null { return localStorage.getItem('signal_access_token'); }
   getRefreshToken(): string | null { return localStorage.getItem('signal_refresh_token'); }
