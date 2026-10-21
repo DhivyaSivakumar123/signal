@@ -21,7 +21,14 @@ function loadEnv() {
 
 loadEnv();
 
-const apiUrl = process.env.API_URL || 'https://gateway-service-644308977417.us-central1.run.app';
+let rawApiUrl = (process.env.API_URL || 'https://gateway-service-644308977417.us-central1.run.app').trim();
+let apiUrl = rawApiUrl;
+try {
+  const parsed = new URL(rawApiUrl);
+  apiUrl = parsed.origin;
+} catch (e) {
+  apiUrl = rawApiUrl.replace(/\/+$/, '');
+}
 
 const configContent = `{
   "apiUrl": "${apiUrl}"
